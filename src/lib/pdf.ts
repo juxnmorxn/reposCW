@@ -5,9 +5,8 @@ import { Reporte } from './types';
 // Helper to remove emojis and non-Latin1 characters that break jsPDF Helvetica font
 const cleanForPDF = (str: string | undefined | null) => {
   if (!str) return '-';
-  // Remove emojis and keep only ASCII + Latin1
+  // Remove non-ASCII and non-Latin1 characters (this automatically removes emojis and strange symbols)
   return str
-    .replace(/[\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]/gu, '')
     .replace(/[^\x20-\x7E\xA0-\xFF\n]/g, '')
     .trim();
 };

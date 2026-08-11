@@ -1,24 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Reporte } from '@/lib/types';
 import {
   Wrench,
-  Settings,
-  PhoneCall,
   FileText,
-  HelpCircle,
   Calendar,
-  User,
   CheckCircle2,
   Clock,
   AlertOctagon,
   XCircle,
   Edit2,
   Trash2,
-  Image as ImageIcon,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
 
 interface ReportCardProps {
@@ -34,23 +27,13 @@ export const ReportCard: React.FC<ReportCardProps> = ({
   onClick,
   onEdit,
   onDelete,
-  onQuickStatusChange,
 }) => {
-
   // Icono según actividad
   const getActivityIcon = () => {
-    switch (reporte.tipo_actividad) {
-      case 'soporte':
-        return <Wrench className="w-5 h-5 text-brand-600" />;
-      case 'configuracion':
-        return <Settings className="w-5 h-5 text-indigo-600" />;
-      case 'seguimiento':
-        return <PhoneCall className="w-5 h-5 text-amber-600" />;
-      case 'administrativo':
-        return <FileText className="w-5 h-5 text-slate-600" />;
-      default:
-        return <HelpCircle className="w-5 h-5 text-teal-600" />;
+    if (reporte.tipo_actividad === 'soporte') {
+      return <Wrench className="w-5 h-5 text-brand-600" />;
     }
+    return <FileText className="w-5 h-5 text-slate-600" />;
   };
 
   // Badges de Estado
@@ -91,16 +74,13 @@ export const ReportCard: React.FC<ReportCardProps> = ({
   };
 
   const title =
-    reporte.cliente ||
-    reporte.equipo ||
-    reporte.cliente_seguimiento ||
+    reporte.nombre_cliente ||
+    reporte.folio ||
     `Actividad ${reporte.tipo_actividad.toUpperCase()}`;
 
   const subtitle =
-    reporte.problema ||
-    reporte.configuracion_realizada ||
-    reporte.motivo_seguimiento ||
     reporte.descripcion_actividad ||
+    reporte.accion_realizada ||
     '';
 
   return (

@@ -26,7 +26,6 @@ export const PDFExportModal: React.FC<PDFExportModalProps> = ({
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const sevenDaysAgoStr = getLocalDateString(sevenDaysAgo);
 
-  const [nombreIngeniero, setNombreIngeniero] = useState('Ingeniero de Soporte Técnico');
   const [modoExport, setModoExport] = useState<'semana' | 'rango'>('semana');
   const [fechaDesde, setFechaDesde] = useState(sevenDaysAgoStr);
   const [fechaHasta, setFechaHasta] = useState(todayStr);
@@ -45,7 +44,7 @@ export const PDFExportModal: React.FC<PDFExportModalProps> = ({
   const handleExportPDF = () => {
     setIsGenerating(true);
     try {
-      generateWeeklyReportPDF(reportesAExportar, semana, año, nombreIngeniero);
+      generateWeeklyReportPDF(reportesAExportar, semana, año);
       onClose();
     } catch (err) {
       console.error('Error generando PDF:', err);
@@ -165,21 +164,7 @@ export const PDFExportModal: React.FC<PDFExportModalProps> = ({
             </div>
           </div>
 
-          {/* Nombre Firma */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Nombre en Pie de Firma del Reporte
-            </label>
-            <div className="relative">
-              <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              <input
-                type="text"
-                value={nombreIngeniero}
-                onChange={(e) => setNombreIngeniero(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
-              />
-            </div>
-          </div>
+
 
           {/* Botones de acción */}
           <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">

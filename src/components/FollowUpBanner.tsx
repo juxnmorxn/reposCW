@@ -32,7 +32,7 @@ export const FollowUpBanner: React.FC<FollowUpBannerProps> = ({
               </span>
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">
-              Casos resueltos hace 2 días que requieren llamada de control de calidad para verificar funcionamiento.
+              {pendingReportes[0].accion_realizada || pendingReportes[0].descripcion_actividad || 'Verificar funcionamiento y conformidad del servicio.'}
             </p>
           </div>
         </div>
@@ -55,15 +55,14 @@ export const FollowUpBanner: React.FC<FollowUpBannerProps> = ({
           >
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-800 text-xs sm:text-sm">
-                  {reporte.cliente || 'Cliente de Soporte'}
-                </span>
+                <span className="font-semibold text-slate-900">{reporte.nombre_cliente || reporte.folio || 'General'}</span>
+                <span className="text-slate-400">|</span>
                 <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
                   Solucionado: {reporte.fecha_solucion || reporte.fecha_creacion}
                 </span>
               </div>
               <p className="text-xs text-slate-600 mt-0.5 line-clamp-1">
-                <span className="font-medium text-slate-700">Problema:</span> {reporte.problema || 'N/A'}
+                <span className="font-medium text-slate-700">Actividad:</span> {reporte.descripcion_actividad || reporte.accion_realizada || 'N/A'}
               </p>
             </div>
 
