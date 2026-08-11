@@ -73,7 +73,7 @@ export const PDFExportModal: React.FC<PDFExportModalProps> = ({
               </h2>
               <p className="text-xs text-slate-500">
                 {modoExport === 'semana'
-                  ? `Semana ISO ${semana} (${año})`
+                  ? `Reportes de la Semana Actual`
                   : `Rango del ${fechaDesde} al ${fechaHasta}`}
               </p>
             </div>
@@ -102,7 +102,7 @@ export const PDFExportModal: React.FC<PDFExportModalProps> = ({
                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                 }`}
               >
-                🗓️ Semana ISO {semana}
+                🗓️ Semana Actual
               </button>
               <button
                 type="button"
