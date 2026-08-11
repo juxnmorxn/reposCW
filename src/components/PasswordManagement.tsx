@@ -500,7 +500,7 @@ export const PasswordManagement: React.FC = () => {
                 <input
                   type="text"
                   required
-                  value={passForm.titulo}
+                  value={passForm.titulo || ''}
                   onChange={(e) => setPassForm({...passForm, titulo: e.target.value})}
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="Ej. Antena Cliente Juan"
@@ -513,7 +513,7 @@ export const PasswordManagement: React.FC = () => {
                   <input
                     type="text"
                     required
-                    value={passForm.usuario}
+                    value={passForm.usuario || ''}
                     onChange={(e) => setPassForm({...passForm, usuario: e.target.value})}
                     className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
@@ -523,7 +523,7 @@ export const PasswordManagement: React.FC = () => {
                   <input
                     type="text"
                     required
-                    value={passForm.contrasena}
+                    value={passForm.contrasena || ''}
                     onChange={(e) => setPassForm({...passForm, contrasena: e.target.value})}
                     className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono"
                   />
