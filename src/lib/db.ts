@@ -109,7 +109,7 @@ export async function initDb(): Promise<boolean> {
 
     // Insertar usuario por defecto 'jux' / 'Juan1200' si no existe
     await client.execute({
-      sql: \`INSERT OR IGNORE INTO usuarios (username, password, nombre, rol, fecha_creacion) VALUES (?, ?, ?, ?, ?)\`,
+      sql: `INSERT OR IGNORE INTO usuarios (username, password, nombre, rol, fecha_creacion) VALUES (?, ?, ?, ?, ?)`,
       args: ['jux', 'Juan1200', 'Ing. JUX', 'Administrador & Soporte ISP', getLocalDateString()],
     });
 
@@ -126,7 +126,7 @@ export function getLocalDateString(d: Date = new Date()): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  return \`\${year}-\${month}-\${day}\`;
+  return `${year}-${month}-${day}`;
 }
 
 // Helper para obtener el mes amigable y la semana del mes
@@ -149,7 +149,7 @@ export function getMonthAndWeekLabel(dateStr?: string): {
     mesNombre,
     semanaMes,
     año,
-    labelCompleto: \`\${mesNombre} - Semana \${semanaMes} (\${año})\`,
+    labelCompleto: `${mesNombre} - Semana ${semanaMes} (${año})`,
   };
 }
 
@@ -268,7 +268,7 @@ export async function fetchReportes(filters?: {
       }
       if (filters?.busqueda) {
         query += ' AND (nombre_cliente LIKE ? OR folio LIKE ? OR descripcion_actividad LIKE ?)';
-        const term = \`%\${filters.busqueda}%\`;
+        const term = `%${filters.busqueda}%`;
         args.push(term, term, term);
       }
 
@@ -341,7 +341,7 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
   const client = getDbClient();
   if (client) {
     try {
-      const sql = \`
+      const sql = `
         INSERT INTO reportes (
           fecha_creacion, tipo_actividad, folio, nombre_cliente, telefono_cliente, 
           abonados_con_senal_degradada, parametros_actuales, equipo_de_rx, 
@@ -350,7 +350,7 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
           descripcion_actividad, estado, evidencia_urls, seguimiento_realizado, 
           fecha_seguimiento, comentarios_adicionales, semana, año
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      \`;
+      `;
       const args: any[] = [
         reporteFinal.fecha_creacion,
         reporteFinal.tipo_actividad,
@@ -380,7 +380,7 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
       // Insertar o actualizar el cliente en la tabla clientes
       if (reporteFinal.nombre_cliente) {
         await client.execute({
-          sql: \`INSERT OR IGNORE INTO clientes (folio, nombre, telefono, fecha_registro) VALUES (?, ?, ?, ?)\`,
+          sql: `INSERT OR IGNORE INTO clientes (folio, nombre, telefono, fecha_registro) VALUES (?, ?, ?, ?)`,
           args: [reporteFinal.folio ?? null, reporteFinal.nombre_cliente, reporteFinal.telefono_cliente ?? null, getLocalDateString()]
         });
       }
@@ -423,7 +423,7 @@ export async function updateReporte(id: number, data: Partial<Reporte>): Promise
       const args: any[] = [];
 
       keys.forEach((key) => {
-        setClauses.push(\`\${key} = ?\`);
+        setClauses.push(`${key} = ?`);
         let val = (data as any)[key];
         if (key === 'evidencia_urls' && Array.isArray(val)) {
           val = JSON.stringify(val);
@@ -435,7 +435,7 @@ export async function updateReporte(id: number, data: Partial<Reporte>): Promise
       });
 
       args.push(id);
-      const sql = \`UPDATE reportes SET \${setClauses.join(', ')} WHERE id = ?\`;
+      const sql = `UPDATE reportes SET ${setClauses.join(', ')} WHERE id = ?`;
       await client.execute({ sql, args });
       return true;
     } catch (err) {
@@ -533,7 +533,7 @@ export async function validateUserInDb(
     try {
       await initDb();
       const res = await client.execute({
-        sql: \`SELECT username, nombre, rol FROM usuarios WHERE username = ? AND password = ?\`,
+        sql: `SELECT username, nombre, rol FROM usuarios WHERE username = ? AND password = ?`,
         args: [username, pass],
       });
       if (res.rows && res.rows.length > 0) {

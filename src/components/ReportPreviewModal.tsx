@@ -49,11 +49,11 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
         <div className="p-5 overflow-y-auto space-y-5">
           <div className="flex items-center gap-2">
             <span
-              className={\`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold \${
+              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
                 reporte.estado === 'Completado'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'bg-amber-100 text-amber-700'
-              }\`}
+              }`}
             >
               {reporte.estado}
             </span>
@@ -128,7 +128,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
               <div className="grid grid-cols-3 gap-2">
                 {reporte.evidencia_urls.map((url, idx) => (
                   <div key={idx} className="aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <img src={url} alt={\`Evidencia \${idx}\`} className="w-full h-full object-cover" />
+                    <img src={url} alt={`Evidencia ${idx}`} className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>

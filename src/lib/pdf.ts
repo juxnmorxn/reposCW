@@ -86,15 +86,15 @@ export function generateWeeklyReportPDF(
     let solucionStr = '-';
 
     if (r.tipo_actividad === 'soporte') {
-      diagnosticoStr = \`RX: \${r.equipo_de_rx || '-'}\nAbonados: \${r.abonados_con_senal_degradada || '-'}\nParam Actuales: \${r.parametros_actuales || '-'}\`;
-      solucionStr = \`Accion: \${r.accion_realizada || '-'}\nParam Mejorados: \${r.parametros_mejorados || '-'}\`;
+      diagnosticoStr = `RX: ${r.equipo_de_rx || '-'}\nAbonados: ${r.abonados_con_senal_degradada || '-'}\nParam Actuales: ${r.parametros_actuales || '-'}`;
+      solucionStr = `Accion: ${r.accion_realizada || '-'}\nParam Mejorados: ${r.parametros_mejorados || '-'}`;
     } else {
       solucionStr = r.descripcion_actividad || '-';
     }
 
     return [
       cleanForPDF(r.fecha_creacion),
-      cleanForPDF(\`\${folioStr}\\n[\${tipo}]\`),
+      cleanForPDF(`${folioStr}\\n[${tipo}]`),
       cleanForPDF(clienteStr),
       cleanForPDF(diagnosticoStr),
       cleanForPDF(solucionStr),
@@ -185,7 +185,7 @@ export function generateWeeklyReportPDF(
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(71, 85, 105);
-            doc.text(cleanForPDF(\`\${sujeto.substring(0, 20)} (\${idx + 1})\`), posX, y + thumbHeight + 4);
+            doc.text(cleanForPDF(`${sujeto.substring(0, 20)} (${idx + 1})`), posX, y + thumbHeight + 4);
           } catch (e) {
             console.warn('Error adjuntando imagen al PDF:', e);
           }
@@ -200,5 +200,5 @@ export function generateWeeklyReportPDF(
     });
   }
 
-  doc.save(\`Repos_Reporte_Actividades_\${new Date().toISOString().split('T')[0]}.pdf\`);
+  doc.save(`Repos_Reporte_Actividades_${new Date().toISOString().split('T')[0]}.pdf`);
 }

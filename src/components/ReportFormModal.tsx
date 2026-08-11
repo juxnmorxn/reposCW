@@ -207,11 +207,11 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => setTipoActividad(item.id as TipoActividad)}
-                    className={\`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition-all \${
+                    className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition-all ${
                       isSelected
                         ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20'
                         : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }\`}
+                    }`}
                   >
                     <IconComp className="w-4 h-4" />
                     {item.label}
@@ -426,7 +426,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                   <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-200 aspect-square bg-slate-100">
                     <img
                       src={url}
-                      alt={\`Evidencia \${idx + 1}\`}
+                      alt={`Evidencia ${idx + 1}`}
                       className="w-full h-full object-cover"
                     />
                     <button
