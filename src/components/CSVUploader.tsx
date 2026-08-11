@@ -5,7 +5,11 @@ import Papa from 'papaparse';
 import { Upload, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Cliente } from '@/lib/types';
 
-export const CSVUploader: React.FC = () => {
+interface CSVUploaderProps {
+  onUploadSuccess?: () => void;
+}
+
+export const CSVUploader: React.FC<CSVUploaderProps> = ({ onUploadSuccess }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -70,6 +74,7 @@ export const CSVUploader: React.FC = () => {
             type: 'success',
             text: `Importación exitosa: ${data.insertados} nuevos, ${data.actualizados} actualizados.`
           });
+          if (onUploadSuccess) onUploadSuccess();
         } catch (error: any) {
           setMessage({
             type: 'error',

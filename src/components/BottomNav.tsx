@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { NavTab } from './Header';
+import { UserSession } from '@/lib/auth';
 
 interface BottomNavProps {
   activeTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
   onOpenNuevoReporte: () => void;
   pendingFollowUpsCount?: number;
+  userSession?: UserSession | null;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({
@@ -15,6 +17,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   onSelectTab,
   onOpenNuevoReporte,
   pendingFollowUpsCount = 0,
+  userSession,
 }) => {
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200 shadow-lg px-2 py-1.5 flex items-center justify-around">
@@ -85,6 +88,21 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         <span className="text-lg leading-none">📜</span>
         <span className="text-[10px] mt-0.5 font-bold">Historial</span>
       </button>
+
+      {/* 👥 Clientes (Solo Admin) */}
+      {userSession?.rol?.includes('Administrador') && (
+        <button
+          onClick={() => onSelectTab('clientes')}
+          className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
+            activeTab === 'clientes'
+              ? 'text-brand-600 font-bold bg-brand-50'
+              : 'text-slate-500 font-medium hover:text-slate-800'
+          }`}
+        >
+          <span className="text-lg leading-none">👥</span>
+          <span className="text-[10px] mt-0.5 font-bold">Clientes</span>
+        </button>
+      )}
     </nav>
   );
 };

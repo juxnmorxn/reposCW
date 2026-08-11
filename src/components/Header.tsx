@@ -20,7 +20,7 @@ import {
   LogOut,
 } from 'lucide-react';
 
-export type NavTab = 'dashboard' | 'crear' | 'gestion' | 'recordatorios' | 'historial';
+export type NavTab = 'dashboard' | 'crear' | 'gestion' | 'recordatorios' | 'historial' | 'clientes';
 
 interface HeaderProps {
   activeTab: NavTab;
@@ -171,6 +171,20 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             )}
           </button>
+
+          {userSession?.rol?.includes('Administrador') && (
+            <button
+              onClick={() => onSelectTab('clientes')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'clientes'
+                  ? 'bg-white text-brand-600 shadow-sm border border-slate-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+              }`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Clientes</span>
+            </button>
+          )}
 
           <button
             onClick={() => onSelectTab('historial')}

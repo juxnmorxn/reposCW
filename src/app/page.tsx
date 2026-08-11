@@ -12,7 +12,7 @@ import { ReportFormModal } from '@/components/ReportFormModal';
 import { ReportPreviewModal } from '@/components/ReportPreviewModal';
 import { PDFExportModal } from '@/components/PDFExportModal';
 import { LoginScreen } from '@/components/LoginScreen';
-import { CSVUploader } from '@/components/CSVUploader';
+import { ClientManagement } from '@/components/ClientManagement';
 import {
   Plus,
   FileDown,
@@ -229,9 +229,6 @@ export default function DashboardPage() {
                   Resumen Ejecutivo
                 </h2>
                 <div className="flex items-center gap-3">
-                  {userSession?.rol?.includes('Administrador') && (
-                    <CSVUploader />
-                  )}
                   {userSession && (
                     <span className="text-xs font-semibold text-brand-600">
                       Usuario: {userSession.nombre}
@@ -604,6 +601,13 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* ======================================================== */}
+        {/* VISTA 5: CLIENTES (SOLO ADMIN)                           */}
+        {/* ======================================================== */}
+        {activeTab === 'clientes' && userSession?.rol?.includes('Administrador') && (
+          <ClientManagement />
+        )}
       </main>
 
       {/* NAVEGACIÓN MÓVIL FIJA CON EMOTICONES */}
@@ -622,6 +626,7 @@ export default function DashboardPage() {
           setIsModalOpen(true);
         }}
         pendingFollowUpsCount={pendingFollowUps.length}
+        userSession={userSession}
       />
 
       {/* MODAL FORMULARIO DINÁMICO */}
