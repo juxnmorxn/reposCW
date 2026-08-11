@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { authenticateUser, UserSession } from '@/lib/auth';
 import { ISPLogo } from './ISPLogo';
-import { Lock, User, LogIn, AlertCircle } from 'lucide-react';
+import { Lock, User, LogIn, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface LoginScreenProps {
   isOpen: boolean;
@@ -16,21 +16,29 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   onLoginSuccess,
   onClose,
 }) => {
-  const [username, setUsername] = useState('soporte');
-  const [password, setPassword] = useState('soporte123');
+  const [username, setUsername] = useState('jux');
+  const [password, setPassword] = useState('Juan1200');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setIsLoading(true);
 
-    const user = authenticateUser(username, password);
-    if (user) {
-      onLoginSuccess(user);
-    } else {
-      setErrorMsg('Usuario o contraseña incorrectos');
+    try {
+      const user = await authenticateUser(username, password);
+      if (user) {
+        onLoginSuccess(user);
+      } else {
+        setErrorMsg('Usuario o contraseña incorrectos');
+      }
+    } catch {
+      setErrorMsg('Error al conectar con el servidor');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,7 +79,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="ej. soporte o admin"
+                placeholder="ej. jux"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
@@ -97,16 +105,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-500/25 active:scale-95 transition-all"
+              disabled={isLoading}
+              className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-brand-500/25 active:scale-95 transition-all disabled:opacity-50"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Iniciar Sesión</span>
+              {isLoading ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <LogIn className="w-4 h-4" />
+              )}
+              <span>{isLoading ? 'Verificando...' : 'Iniciar Sesión'}</span>
             </button>
           </div>
         </form>
 
         <div className="text-center pt-2 border-t border-slate-100 text-[11px] text-slate-400">
-          Repos ISP v2.0 • Credenciales demo: <span className="font-semibold text-slate-600">soporte / soporte123</span>
+          Repos ISP • Usuario: <span className="font-bold text-slate-700">jux</span> / Contraseña: <span className="font-bold text-slate-700">Juan1200</span>
         </div>
       </div>
     </div>

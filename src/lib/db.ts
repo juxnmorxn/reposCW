@@ -73,6 +73,15 @@ CREATE TABLE IF NOT EXISTS configuracion_app (
     valor TEXT,
     actualizado DATE
 );
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    rol TEXT NOT NULL,
+    fecha_creacion DATE
+);
 `;
 
 export async function initDb(): Promise<boolean> {
@@ -87,7 +96,14 @@ export async function initDb(): Promise<boolean> {
     for (const stmt of statements) {
       await client.execute(stmt);
     }
-    console.log('Base de datos Turso inicializada con éxito.');
+
+    // Insertar usuario por defecto 'jux' / 'Juan1200' si no existe
+    await client.execute({
+      sql: `INSERT OR IGNORE INTO usuarios (username, password, nombre, rol, fecha_creacion) VALUES (?, ?, ?, ?, ?)`,
+      args: ['jux', 'Juan1200', 'Ing. JUX', 'Administrador & Soporte ISP', getLocalDateString()],
+    });
+
+    console.log('Base de datos Turso e tabla usuarios inicializada con éxito.');
     return true;
   } catch (error) {
     console.error('Error al inicializar la base de datos Turso:', error);
@@ -538,4 +554,40 @@ function parseReporteRow(row: any): Reporte {
     semana: Number(row.semana || 0),
     año: Number(row.año || 0),
   };
+}
+
+export async function validateUserInDb(
+  username: string,
+  pass: string
+): Promise<{ username: string; nombre: string; rol: string } | null> {
+  const client = getDbClient();
+  if (client) {
+    try {
+      await initDb();
+      const res = await client.execute({
+        sql: `SELECT username, nombre, rol FROM usuarios WHERE username = ? AND password = ?`,
+        args: [username, pass],
+      });
+      if (res.rows && res.rows.length > 0) {
+        const r = res.rows[0];
+        return {
+          username: String(r.username),
+          nombre: String(r.nombre),
+          rol: String(r.rol),
+        };
+      }
+    } catch (err) {
+      console.error('Error validando usuario en Turso DB:', err);
+    }
+  }
+
+  // Fallback para desarrollo local
+  if (username.toLowerCase() === 'jux' && pass === 'Juan1200') {
+    return {
+      username: 'jux',
+      nombre: 'Ing. JUX',
+      rol: 'Administrador & Soporte ISP',
+    };
+  }
+  return null;
 }
