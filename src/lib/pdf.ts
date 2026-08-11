@@ -53,77 +53,133 @@ export function generateWeeklyReportPDF(
   
   y += 6;
 
-  // 3. TABLA PRINCIPAL DE REPORTES
-  const tableData = reportes.map((r) => {
-    const tipo = r.tipo_actividad.toUpperCase();
-    
-    let folioStr = r.folio ? `Folio: ${r.folio}` : '';
-    let clienteStr = r.nombre_cliente ? `${r.nombre_cliente}\nTel: ${r.telefono_cliente || '-'}` : '-';
-    
-    let diagnosticoStr = '-';
-    let solucionStr = '-';
+  // Separar los reportes
+  const reportesSoporte = reportes.filter(r => r.tipo_actividad === 'soporte');
+  const reportesLibres = reportes.filter(r => r.tipo_actividad === 'libre');
 
-    if (r.tipo_actividad === 'soporte') {
-      diagnosticoStr = `RX: ${r.equipo_de_rx || '-'}\nParam Actuales: ${r.parametros_actuales || '-'}`;
-      solucionStr = `Accion: ${r.accion_realizada || '-'}\nParam Mejorados: ${r.parametros_mejorados || '-'}`;
-    } else {
-      solucionStr = r.descripcion_actividad || '-';
-    }
+  // 3. TABLA DE REPORTES DE SOPORTE TÉCNICO
+  if (reportesSoporte.length > 0) {
+    const tableDataSoporte = reportesSoporte.map((r) => {
+      
+      let clienteStr = '';
+      if (r.folio) clienteStr += `Folio: ${r.folio}\n`;
+      if (r.nombre_cliente) clienteStr += `${r.nombre_cliente}\n`;
+      if (r.telefono_cliente) clienteStr += `Tel: ${r.telefono_cliente}`;
+      
+      let diagnosticoStr = `RX: ${r.equipo_de_rx || '-'}\nParam Actuales: ${r.parametros_actuales || '-'}`;
+      let solucionStr = `Accion: ${r.accion_realizada || '-'}\nParam Mejorados: ${r.parametros_mejorados || '-'}`;
+      let estadoStr = `${r.estado}\nCierre: ${r.fecha_solucion || '-'}`;
 
-    return [
-      cleanForPDF(r.fecha_creacion),
-      cleanForPDF(`${folioStr}\n[${tipo}]`),
-      cleanForPDF(clienteStr),
-      cleanForPDF(diagnosticoStr),
-      cleanForPDF(solucionStr),
-      cleanForPDF(r.estado),
-    ];
-  });
+      return [
+        cleanForPDF(r.fecha_creacion),
+        cleanForPDF(clienteStr),
+        cleanForPDF(diagnosticoStr),
+        cleanForPDF(solucionStr),
+        cleanForPDF(estadoStr),
+      ];
+    });
 
-  autoTable(doc, {
-    startY: y,
-    head: [['Fecha', 'Folio / Tipo', 'Cliente / Ubicacion', 'Diagnostico Inicial', 'Accion / Solucion', 'Estado']],
-    body: tableData,
-    theme: 'grid',
-    headStyles: {
-      fillColor: [79, 70, 229],
-      textColor: [255, 255, 255],
-      fontSize: 8,
-      fontStyle: 'bold',
-      halign: 'center',
-    },
-    bodyStyles: {
-      fontSize: 7,
-      textColor: [51, 65, 85],
-      cellPadding: 2,
-    },
-    columnStyles: {
-      0: { cellWidth: 16, halign: 'center' },
-      1: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
-      2: { cellWidth: 38 },
-      3: { cellWidth: 38 },
-      4: { cellWidth: 50 },
-      5: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
-    },
-    didParseCell: (data) => {
-      if (data.section === 'body' && data.column.index === 5) {
-        const estado = data.cell.raw as string;
-        if (estado === 'Completado' || estado === 'Resuelto') {
-          data.cell.styles.textColor = [16, 185, 129];
-        } else if (estado === 'Pendiente' || estado === 'En Proceso') {
-          data.cell.styles.textColor = [245, 158, 11];
-        } else if (estado === 'No Completado' || estado === 'Rechazado') {
-          data.cell.styles.textColor = [239, 68, 68];
+    autoTable(doc, {
+      startY: y,
+      head: [['Fecha Creacion', 'Cliente y Ubicacion', 'Diagnostico Inicial', 'Accion y Resultados', 'Estado y Cierre']],
+      body: tableDataSoporte,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [79, 70, 229],
+        textColor: [255, 255, 255],
+        fontSize: 8,
+        fontStyle: 'bold',
+        halign: 'center',
+      },
+      bodyStyles: {
+        fontSize: 7,
+        textColor: [51, 65, 85],
+        cellPadding: 2,
+      },
+      columnStyles: {
+        0: { cellWidth: 20, halign: 'center' },
+        1: { cellWidth: 42 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 55 },
+        4: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
+      },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 4) {
+          const estadoInfo = data.cell.raw as string;
+          if (estadoInfo.includes('Completado') || estadoInfo.includes('Resuelto')) {
+            data.cell.styles.textColor = [16, 185, 129];
+          } else if (estadoInfo.includes('Pendiente') || estadoInfo.includes('En Proceso')) {
+            data.cell.styles.textColor = [245, 158, 11];
+          } else if (estadoInfo.includes('No Completado') || estadoInfo.includes('Rechazado')) {
+            data.cell.styles.textColor = [239, 68, 68];
+          }
         }
-      }
-    },
-    margin: { left: 14, right: 14 },
-  });
+      },
+      margin: { left: 14, right: 14 },
+    });
 
-  // @ts-ignore
-  y = (doc as any).lastAutoTable.finalY + 12;
+    // @ts-ignore
+    y = (doc as any).lastAutoTable.finalY + 10;
+  }
 
-  // 4. ANEXO DE EVIDENCIAS FOTOGRÁFICAS
+  // 4. TABLA DE REPORTES LIBRES
+  if (reportesLibres.length > 0) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(51, 65, 85);
+    doc.text('REPORTE DE ACTIVIDADES LIBRES', 14, y);
+    y += 4;
+
+    const tableDataLibre = reportesLibres.map((r) => {
+      return [
+        cleanForPDF(r.fecha_creacion),
+        cleanForPDF(r.descripcion_actividad),
+        cleanForPDF(r.estado),
+      ];
+    });
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Fecha Creacion', 'Detalle de Actividad Libre', 'Estado']],
+      body: tableDataLibre,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [15, 118, 110], // Teal 700 para distinguirlo visualmente
+        textColor: [255, 255, 255],
+        fontSize: 8,
+        fontStyle: 'bold',
+        halign: 'center',
+      },
+      bodyStyles: {
+        fontSize: 7,
+        textColor: [51, 65, 85],
+        cellPadding: 3,
+      },
+      columnStyles: {
+        0: { cellWidth: 30, halign: 'center' },
+        1: { cellWidth: 122 },
+        2: { cellWidth: 30, halign: 'center', fontStyle: 'bold' },
+      },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 2) {
+          const estadoInfo = data.cell.raw as string;
+          if (estadoInfo.includes('Completado') || estadoInfo.includes('Resuelto')) {
+            data.cell.styles.textColor = [16, 185, 129];
+          } else if (estadoInfo.includes('Pendiente') || estadoInfo.includes('En Proceso')) {
+            data.cell.styles.textColor = [245, 158, 11];
+          } else if (estadoInfo.includes('No Completado') || estadoInfo.includes('Rechazado')) {
+            data.cell.styles.textColor = [239, 68, 68];
+          }
+        }
+      },
+      margin: { left: 14, right: 14 },
+    });
+
+    // @ts-ignore
+    y = (doc as any).lastAutoTable.finalY + 10;
+  }
+
+  // 5. ANEXO DE EVIDENCIAS FOTOGRÁFICAS
   const reportesConFotos = reportes.filter((r) => r.evidencia_urls && r.evidencia_urls.length > 0);
 
   if (reportesConFotos.length > 0) {
