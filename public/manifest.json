@@ -1,0 +1,24 @@
+{
+  "name": "Repos ISP - Sistema de Reportes de Soporte Técnico",
+  "short_name": "Repos ISP",
+  "description": "Sistema de gestión de actividades diarias y reportes para Ingeniero de Soporte Técnico ISP",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
