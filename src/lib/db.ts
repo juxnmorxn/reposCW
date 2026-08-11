@@ -1,5 +1,5 @@
 import { createClient, Client } from '@libsql/client';
-import { Reporte, ResultadoSeguimiento, Cliente } from './types';
+import { Reporte, ResultadoSeguimiento, Cliente, GrupoContrasena, Contrasena } from './types';
 
 let dbClient: Client | null = null;
 
@@ -682,8 +682,6 @@ export async function validateUserInDb(
 // -------------------------------------------------------------
 // OPERACIONES DE GESTIÓN DE CONTRASEÑAS (TURSO)
 // -------------------------------------------------------------
-
-import { GrupoContrasena, Contrasena } from './types';
 
 export async function fetchGruposContrasenas(): Promise<GrupoContrasena[]> {
   const client = getDbClient();
