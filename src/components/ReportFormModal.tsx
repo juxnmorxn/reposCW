@@ -37,7 +37,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
   const [folio, setFolio] = useState('');
   const [nombreCliente, setNombreCliente] = useState('');
   const [telefonoCliente, setTelefonoCliente] = useState('');
-  const [abonadosDegradada, setAbonadosDegradada] = useState<string | number>('');
+
   const [equipoRx, setEquipoRx] = useState('');
   const [parametrosActuales, setParametrosActuales] = useState('');
   const [fechaReporteCreado, setFechaReporteCreado] = useState(todayStr);
@@ -47,7 +47,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
   // General / Libre
   const [descripcionActividad, setDescripcionActividad] = useState('');
-  const [comentariosAdicionales, setComentariosAdicionales] = useState('');
+
 
   // Evidencias
   const [evidenciaUrls, setEvidenciaUrls] = useState<string[]>([]);
@@ -62,7 +62,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
       setFolio(editingReporte.folio || '');
       setNombreCliente(editingReporte.nombre_cliente || '');
       setTelefonoCliente(editingReporte.telefono_cliente || '');
-      setAbonadosDegradada(editingReporte.abonados_con_senal_degradada || '');
+
       setEquipoRx(editingReporte.equipo_de_rx || '');
       setParametrosActuales(editingReporte.parametros_actuales || '');
       setFechaReporteCreado(editingReporte.fecha_reporte_creado || todayStr);
@@ -70,7 +70,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
       setAccionRealizada(editingReporte.accion_realizada || '');
       setParametrosMejorados(editingReporte.parametros_mejorados || '');
       setDescripcionActividad(editingReporte.descripcion_actividad || '');
-      setComentariosAdicionales(editingReporte.comentarios_adicionales || '');
+
       setEvidenciaUrls(editingReporte.evidencia_urls || []);
     } else {
       resetForm();
@@ -84,7 +84,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
     setFolio('');
     setNombreCliente('');
     setTelefonoCliente('');
-    setAbonadosDegradada('');
+
     setEquipoRx('');
     setParametrosActuales('');
     setFechaReporteCreado(todayStr);
@@ -92,7 +92,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
     setAccionRealizada('');
     setParametrosMejorados('');
     setDescripcionActividad('');
-    setComentariosAdicionales('');
+
     setEvidenciaUrls([]);
   };
 
@@ -130,7 +130,6 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
         tipo_actividad: tipoActividad,
         estado,
         evidencia_urls: evidenciaUrls,
-        comentarios_adicionales: comentariosAdicionales,
       };
 
       if (editingReporte?.id) {
@@ -141,7 +140,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
         payload.folio = folio;
         payload.nombre_cliente = nombreCliente;
         payload.telefono_cliente = telefonoCliente;
-        payload.abonados_con_senal_degradada = abonadosDegradada;
+
         payload.equipo_de_rx = equipoRx;
         payload.parametros_actuales = parametrosActuales;
         payload.fecha_reporte_creado = fechaReporteCreado;
@@ -282,7 +281,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1">Teléfono</label>
                   <input
@@ -290,17 +289,6 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                     placeholder="Número de contacto"
                     value={telefonoCliente}
                     onChange={(e) => setTelefonoCliente(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Abonados con señal degradada</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Cantidad de abonados"
-                    value={abonadosDegradada}
-                    onChange={(e) => setAbonadosDegradada(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
@@ -442,19 +430,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
             )}
           </div>
 
-          {/* Comentarios Adicionales */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Comentarios u Observaciones Adicionales
-            </label>
-            <input
-              type="text"
-              placeholder="Cualquier nota extra relevante..."
-              value={comentariosAdicionales}
-              onChange={(e) => setComentariosAdicionales(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-            />
-          </div>
+
 
           {/* Botones de acción */}
           <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">

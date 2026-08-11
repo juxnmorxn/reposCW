@@ -87,10 +87,6 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Detalles Técnicos</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <span className="block text-[10px] text-slate-500 uppercase font-bold">Abonados Degradados</span>
-                    <span className="text-sm font-semibold text-slate-800">{reporte.abonados_con_senal_degradada || '-'}</span>
-                  </div>
-                  <div>
                     <span className="block text-[10px] text-slate-500 uppercase font-bold">Equipo RX</span>
                     <span className="text-sm font-semibold text-slate-800">{reporte.equipo_de_rx || '-'}</span>
                   </div>
@@ -135,12 +131,7 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
             </div>
           )}
 
-          {reporte.comentarios_adicionales && (
-            <div className="bg-amber-50 rounded-xl p-3 border border-amber-100">
-              <h3 className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Comentarios Adicionales</h3>
-              <p className="text-xs text-amber-900">{reporte.comentarios_adicionales}</p>
-            </div>
-          )}
+
         </div>
 
         <div className="px-5 py-4 border-t border-slate-100 flex justify-end gap-3 bg-white">

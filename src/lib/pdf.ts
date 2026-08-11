@@ -17,7 +17,7 @@ export function generateWeeklyReportPDF(
   año: number
 ) {
   const doc = new jsPDF({
-    orientation: 'landscape', // Better for tables with many columns
+    orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
   });
@@ -27,54 +27,33 @@ export function generateWeeklyReportPDF(
 
   // 1. ENCABEZADO CORPORATIVO "REPOS"
   doc.setFillColor(79, 70, 229); // Indigo 600
-  doc.rect(0, 0, pageWidth, 24, 'F');
+  doc.rect(0, 0, pageWidth, 20, 'F');
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text('REPOS - INFORME DE ACTIVIDADES', 14, 12);
+  doc.setFontSize(14);
+  doc.text('REPOS - INFORME DE ACTIVIDADES', 14, 13);
 
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Reporte de Actividades`, 14, 18);
-  doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth - 14, 18, { align: 'right' });
+  doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth - 14, 13, { align: 'right' });
 
-  y = 32;
+  y = 26;
 
-  // 2. RESUMEN EJECUTIVO (KPIS) sin emojis
+  // 2. RESUMEN EJECUTIVO COMPACTO
   const total = reportes.length;
   const completados = reportes.filter((r) => r.estado === 'Completado' || r.estado === 'Resuelto').length;
   const pendientes = reportes.filter((r) => r.estado === 'Pendiente' || r.estado === 'En Proceso').length;
   const noCompletados = reportes.filter((r) => r.estado === 'No Completado' || r.estado === 'Rechazado').length;
 
-  doc.setFillColor(248, 250, 252);
-  doc.roundedRect(14, y, pageWidth - 28, 22, 3, 3, 'F');
-  doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(14, y, pageWidth - 28, 22, 3, 3, 'S');
-
   doc.setTextColor(51, 65, 85);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text('RESUMEN GENERAL DE REGISTROS', 18, y + 6);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-
-  const colWidth = (pageWidth - 36) / 4;
-  doc.text(`Total Registros: ${total}`, 18, y + 14);
-  doc.text(`Completados: ${completados}`, 18 + colWidth, y + 14);
-  doc.text(`Pendientes: ${pendientes}`, 18 + colWidth * 2, y + 14);
-  doc.text(`No Completados: ${noCompletados}`, 18 + colWidth * 3, y + 14);
-
-  y += 30;
+  doc.text(`Resumen: Total (${total}) | Completados (${completados}) | Pendientes (${pendientes}) | No Completados (${noCompletados})`, 14, y);
+  
+  y += 6;
 
   // 3. TABLA PRINCIPAL DE REPORTES
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(30, 41, 59);
-  doc.text('TABLA DETALLADA DE REPORTES', 14, y);
-  y += 4;
-
   const tableData = reportes.map((r) => {
     const tipo = r.tipo_actividad.toUpperCase();
     
@@ -85,7 +64,7 @@ export function generateWeeklyReportPDF(
     let solucionStr = '-';
 
     if (r.tipo_actividad === 'soporte') {
-      diagnosticoStr = `RX: ${r.equipo_de_rx || '-'}\nAbonados: ${r.abonados_con_senal_degradada || '-'}\nParam Actuales: ${r.parametros_actuales || '-'}`;
+      diagnosticoStr = `RX: ${r.equipo_de_rx || '-'}\nParam Actuales: ${r.parametros_actuales || '-'}`;
       solucionStr = `Accion: ${r.accion_realizada || '-'}\nParam Mejorados: ${r.parametros_mejorados || '-'}`;
     } else {
       solucionStr = r.descripcion_actividad || '-';
@@ -93,7 +72,7 @@ export function generateWeeklyReportPDF(
 
     return [
       cleanForPDF(r.fecha_creacion),
-      cleanForPDF(`${folioStr}\\n[${tipo}]`),
+      cleanForPDF(`${folioStr}\n[${tipo}]`),
       cleanForPDF(clienteStr),
       cleanForPDF(diagnosticoStr),
       cleanForPDF(solucionStr),
@@ -114,17 +93,17 @@ export function generateWeeklyReportPDF(
       halign: 'center',
     },
     bodyStyles: {
-      fontSize: 8,
+      fontSize: 7,
       textColor: [51, 65, 85],
-      cellPadding: 3,
+      cellPadding: 2,
     },
     columnStyles: {
-      0: { cellWidth: 20, halign: 'center' },
-      1: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
-      2: { cellWidth: 50 },
-      3: { cellWidth: 60 },
-      4: { cellWidth: 85 },
-      5: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
+      0: { cellWidth: 16, halign: 'center' },
+      1: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
+      2: { cellWidth: 38 },
+      3: { cellWidth: 38 },
+      4: { cellWidth: 50 },
+      5: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
     },
     didParseCell: (data) => {
       if (data.section === 'body' && data.column.index === 5) {
@@ -144,30 +123,30 @@ export function generateWeeklyReportPDF(
   // @ts-ignore
   y = (doc as any).lastAutoTable.finalY + 12;
 
-  // 4. ANEXO DE EVIDENCIAS FOTOGRÁFICAS (IMÁGENES EN MINIATURA CUADRADAS)
+  // 4. ANEXO DE EVIDENCIAS FOTOGRÁFICAS
   const reportesConFotos = reportes.filter((r) => r.evidencia_urls && r.evidencia_urls.length > 0);
 
   if (reportesConFotos.length > 0) {
-    if (y > 170) {
+    if (y > 250) {
       doc.addPage();
       y = 20;
     }
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setTextColor(30, 41, 59);
     doc.text('ANEXO DE EVIDENCIAS FOTOGRAFICAS Y CAPTURAS', 14, y);
     y += 6;
 
     let posX = 14;
-    const thumbWidth = 45;
-    const thumbHeight = 45;
-    const gap = 12;
+    const thumbWidth = 40;
+    const thumbHeight = 40;
+    const gap = 6;
 
     reportesConFotos.forEach((r) => {
       const sujeto = r.nombre_cliente || r.folio || 'Evidencia';
       (r.evidencia_urls || []).forEach((imgUrl, idx) => {
-        if (y + thumbHeight + 15 > 200) {
+        if (y + thumbHeight + 15 > 280) {
           doc.addPage();
           y = 20;
           posX = 14;
@@ -192,7 +171,7 @@ export function generateWeeklyReportPDF(
           posX += thumbWidth + gap;
           if (posX + thumbWidth > pageWidth - 14) {
             posX = 14;
-            y += thumbHeight + 12;
+            y += thumbHeight + 8;
           }
         }
       });
