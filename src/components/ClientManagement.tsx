@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Cliente } from '@/lib/types';
 import { CSVUploader } from './CSVUploader';
 import { ClientFormModal } from './ClientFormModal';
+import { ClientBulkModal } from './ClientBulkModal';
 import { 
   Search, 
   UserPlus, 
@@ -15,7 +16,9 @@ import {
   RadioTower,
   ShieldCheck,
   ShieldAlert,
-  Loader2
+  Loader2,
+  Zap,
+  Power
 } from 'lucide-react';
 
 export const ClientManagement: React.FC = () => {
@@ -29,6 +32,7 @@ export const ClientManagement: React.FC = () => {
   const limit = 50;
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Cliente | null>(null);
 
   const loadData = async () => {
@@ -93,6 +97,21 @@ export const ClientManagement: React.FC = () => {
     }
   };
 
+  const handleToggleStatus = async (cliente: Cliente) => {
+    try {
+      const res = await fetch('/api/clientes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...cliente, activo: !cliente.activo }),
+      });
+      if (res.ok) {
+        setClientes(clientes.map(c => c.id === cliente.id ? { ...c, activo: !c.activo } : c));
+      }
+    } catch (err) {
+      console.error('Error toggling client status:', err);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
@@ -108,9 +127,17 @@ export const ClientManagement: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <CSVUploader onUploadSuccess={loadData} />
           
+          <button
+            onClick={() => setIsBulkModalOpen(true)}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-md shadow-slate-900/20 active:scale-95 transition-all"
+          >
+            <Zap className="w-4 h-4 text-amber-400" />
+            <span>Acciones Masivas</span>
+          </button>
+
           <button
             onClick={() => {
               setEditingClient(null);
@@ -259,6 +286,17 @@ export const ClientManagement: React.FC = () => {
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
+                          onClick={() => handleToggleStatus(cliente)}
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            cliente.activo 
+                              ? 'text-emerald-600 hover:bg-emerald-50' 
+                              : 'text-slate-400 hover:bg-slate-100 hover:text-slate-700'
+                          }`}
+                          title={cliente.activo ? "Desactivar" : "Activar"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => {
                             setEditingClient(cliente);
                             setIsModalOpen(true);
@@ -315,6 +353,12 @@ export const ClientManagement: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSaveClient}
         editingClient={editingClient}
+      />
+
+      <ClientBulkModal
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        onSuccess={loadData}
       />
     </div>
   );
