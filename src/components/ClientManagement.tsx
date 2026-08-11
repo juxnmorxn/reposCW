@@ -25,6 +25,8 @@ export const ClientManagement: React.FC = () => {
 
   const [busqueda, setBusqueda] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'antena' | 'fibra'>('todos');
+  const [page, setPage] = useState(1);
+  const limit = 50;
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Cliente | null>(null);
@@ -32,7 +34,8 @@ export const ClientManagement: React.FC = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const queryUrl = `/api/clientes?busqueda=${encodeURIComponent(busqueda)}&tipo=${tipoFiltro}`;
+      const offset = (page - 1) * limit;
+      const queryUrl = `/api/clientes?busqueda=${encodeURIComponent(busqueda)}&tipo=${tipoFiltro}&limit=${limit}&offset=${offset}`;
       const res = await fetch(queryUrl);
       if (res.ok) {
         const json = await res.json();
@@ -47,8 +50,12 @@ export const ClientManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    loadData();
+    setPage(1); // Reset page on new search/filter
   }, [busqueda, tipoFiltro]);
+
+  useEffect(() => {
+    loadData();
+  }, [busqueda, tipoFiltro, page]);
 
   const handleSaveClient = async (data: Cliente) => {
     try {
@@ -274,6 +281,31 @@ export const ClientManagement: React.FC = () => {
                 ))}
               </tbody>
             </table>
+            
+            {/* Controles de Paginación */}
+            {total > limit && (
+              <div className="flex items-center justify-between px-5 py-4 border-t border-slate-200 bg-slate-50">
+                <span className="text-xs text-slate-500 font-medium">
+                  Mostrando {(page - 1) * limit + 1} a {Math.min(page * limit, total)} de {total}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-white"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={page * limit >= total}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-white"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
