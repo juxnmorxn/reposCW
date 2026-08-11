@@ -64,6 +64,7 @@ export function generateWeeklyReportPDF(
       let clienteStr = '';
       if (r.folio) clienteStr += `Folio: ${r.folio}\n`;
       if (r.nombre_cliente) clienteStr += `${r.nombre_cliente}\n`;
+      if (r.ip_cliente) clienteStr += `IP: ${r.ip_cliente}\n`;
       if (r.telefono_cliente) clienteStr += `Tel: ${r.telefono_cliente}`;
       
       let diagnosticoStr = `RX: ${r.equipo_de_rx || '-'}\nParam Actuales: ${r.parametros_actuales || '-'}`;
@@ -81,7 +82,7 @@ export function generateWeeklyReportPDF(
 
     autoTable(doc, {
       startY: y,
-      head: [['Fecha Creacion', 'Cliente y Ubicacion', 'Diagnostico Inicial', 'Accion y Resultados', 'Estado y Cierre']],
+      head: [['Fecha Creacion', 'Cliente', 'Diagnostico Inicial', 'Accion y Resultados', 'Estado y Cierre']],
       body: tableDataSoporte,
       theme: 'grid',
       headStyles: {

@@ -36,6 +36,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
   // Soporte / Cliente
   const [folio, setFolio] = useState('');
   const [nombreCliente, setNombreCliente] = useState('');
+  const [ipCliente, setIpCliente] = useState('');
   const [telefonoCliente, setTelefonoCliente] = useState('');
 
   const [equipoRx, setEquipoRx] = useState('');
@@ -61,6 +62,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
       setEstado((editingReporte.estado as EstadoReporte) || 'Pendiente');
       setFolio(editingReporte.folio || '');
       setNombreCliente(editingReporte.nombre_cliente || '');
+      setIpCliente(editingReporte.ip_cliente || '');
       setTelefonoCliente(editingReporte.telefono_cliente || '');
 
       setEquipoRx(editingReporte.equipo_de_rx || '');
@@ -83,6 +85,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
     setEstado('Pendiente');
     setFolio('');
     setNombreCliente('');
+    setIpCliente('');
     setTelefonoCliente('');
 
     setEquipoRx('');
@@ -139,6 +142,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
       if (tipoActividad === 'soporte') {
         payload.folio = folio;
         payload.nombre_cliente = nombreCliente;
+        payload.ip_cliente = ipCliente;
         payload.telefono_cliente = telefonoCliente;
 
         payload.equipo_de_rx = equipoRx;
@@ -281,7 +285,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1">Teléfono</label>
                   <input
@@ -289,6 +293,16 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                     placeholder="Número de contacto"
                     value={telefonoCliente}
                     onChange={(e) => setTelefonoCliente(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Dirección IP</label>
+                  <input
+                    type="text"
+                    placeholder="Ej. 192.168.1.10"
+                    value={ipCliente}
+                    onChange={(e) => setIpCliente(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>

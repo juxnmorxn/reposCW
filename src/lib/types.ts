@@ -12,6 +12,7 @@ export interface Reporte {
   // Campos SOPORTE
   folio?: string;
   nombre_cliente?: string;
+  ip_cliente?: string;
   telefono_cliente?: string;
   abonados_con_senal_degradada?: string | number;
   parametros_actuales?: string;

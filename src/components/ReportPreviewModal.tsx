@@ -77,6 +77,10 @@ export const ReportPreviewModal: React.FC<ReportPreviewModalProps> = ({
                     <span className="text-sm font-semibold text-slate-800">{reporte.telefono_cliente || '-'}</span>
                   </div>
                   <div className="col-span-2">
+                    <span className="block text-[10px] text-slate-500 uppercase font-bold">Dirección IP</span>
+                    <span className="text-sm font-semibold text-brand-600">{reporte.ip_cliente || '-'}</span>
+                  </div>
+                  <div className="col-span-2">
                     <span className="block text-[10px] text-slate-500 uppercase font-bold">Nombre / Ubicación</span>
                     <span className="text-sm font-semibold text-slate-800">{reporte.nombre_cliente || '-'}</span>
                   </div>

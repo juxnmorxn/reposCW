@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS reportes (
     -- Campos SOPORTE
     folio TEXT,
     nombre_cliente TEXT,
+    ip_cliente TEXT,
     telefono_cliente TEXT,
     abonados_con_senal_degradada TEXT,
     parametros_actuales TEXT,
@@ -202,6 +203,7 @@ function getSeedReports(): Reporte[] {
       tipo_actividad: 'soporte',
       folio: 'F-1001',
       nombre_cliente: 'Hospital Central',
+      ip_cliente: '192.168.1.100',
       telefono_cliente: '555-0123',
       abonados_con_senal_degradada: 12,
       parametros_actuales: 'Latencia 150ms, Tx: -28dBm',
@@ -343,19 +345,20 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
     try {
       const sql = `
         INSERT INTO reportes (
-          fecha_creacion, tipo_actividad, folio, nombre_cliente, telefono_cliente, 
+          fecha_creacion, tipo_actividad, folio, nombre_cliente, ip_cliente, telefono_cliente, 
           abonados_con_senal_degradada, parametros_actuales, equipo_de_rx, 
           fecha_reporte_creado, fecha_solucion, parametros_mejorados, accion_realizada,
           cliente_seguimiento, motivo_seguimiento, resultado_seguimiento, 
           descripcion_actividad, estado, evidencia_urls, seguimiento_realizado, 
           fecha_seguimiento, comentarios_adicionales, semana, año
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
       const args: any[] = [
         reporteFinal.fecha_creacion,
         reporteFinal.tipo_actividad,
         reporteFinal.folio ?? null,
         reporteFinal.nombre_cliente ?? null,
+        reporteFinal.ip_cliente ?? null,
         reporteFinal.telefono_cliente ?? null,
         reporteFinal.abonados_con_senal_degradada ?? null,
         reporteFinal.parametros_actuales ?? null,
@@ -501,6 +504,7 @@ function parseReporteRow(row: any): Reporte {
     tipo_actividad: row.tipo_actividad as any,
     folio: row.folio || undefined,
     nombre_cliente: row.nombre_cliente || undefined,
+    ip_cliente: row.ip_cliente || undefined,
     telefono_cliente: row.telefono_cliente || undefined,
     abonados_con_senal_degradada: row.abonados_con_senal_degradada || undefined,
     parametros_actuales: row.parametros_actuales || undefined,
