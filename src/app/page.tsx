@@ -199,7 +199,7 @@ function DashboardContent() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col pb-28 md:pb-8">
+    <div className="min-h-screen flex flex-col pb-28 md:pb-8">
       {/* BARRA SUPERIOR ÚNICA "REPOS ISP" */}
       <Header
         activeTab={activeTab}

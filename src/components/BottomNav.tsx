@@ -18,12 +18,6 @@ interface BottomNavProps {
   userSession?: UserSession | null;
 }
 
-const TABS: { id: NavTab; label: string; icon: React.ElementType }[] = [
-  { id: 'dashboard', label: 'Inicio', icon: Home },
-  { id: 'gestion', label: 'Reportes', icon: LayoutList },
-  { id: 'recordatorios', label: 'Seguimiento', icon: Clock },
-];
-
 export const BottomNav: React.FC<BottomNavProps> = ({
   activeTab,
   onSelectTab,
@@ -41,141 +35,147 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
   const isMoreActive = ['historial', 'clientes'].includes(activeTab);
 
+  const NavButton = ({ id, label, icon: Icon, badge }: { id: NavTab; label: string; icon: React.ElementType; badge?: number }) => {
+    const isActive = activeTab === id;
+    return (
+      <button
+        onClick={() => handleTab(id)}
+        className="relative flex flex-col items-center justify-center gap-0.5"
+      >
+        <div className={`w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-200 ${
+          isActive
+            ? 'bg-[#ccff00] text-[#0f1117] shadow-lg shadow-[#ccff00]/30'
+            : 'text-slate-400 dark:text-white/40'
+        }`}>
+          <Icon className="w-[22px] h-[22px]" strokeWidth={isActive ? 2.5 : 1.8} />
+        </div>
+        {badge && badge > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-bold bg-rose-500 text-white rounded-full flex items-center justify-center ring-2 ring-[#1a1d27]">{badge}</span>
+        )}
+      </button>
+    );
+  };
+
   return (
     <>
-      {/* ────── FLOATING NAV ────── */}
-      <nav className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[380px]">
-        <div className="bottom-nav-float rounded-[28px] px-4 py-3 flex items-center justify-between">
+      {/* ═══════ FLOATING BOTTOM NAV ═══════ */}
+      <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[88%] max-w-[360px]">
+        <div
+          className="rounded-[26px] px-3 py-2.5 flex items-center justify-between"
+          style={{
+            background: 'rgba(22, 25, 35, 0.92)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.05) inset',
+          }}
+        >
+          {/* ── Left: Inicio ── */}
+          <NavButton id="dashboard" label="Inicio" icon={Home} />
 
-          {/* Left tabs */}
-          {TABS.map(({ id, label, icon: Icon }) => {
-            const isActive = activeTab === id;
-            return (
-              <button
-                key={id}
-                onClick={() => handleTab(id)}
-                className="relative flex flex-col items-center justify-center gap-0.5 transition-all"
-              >
-                <div className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-[#ccff00] text-slate-900 shadow-lg shadow-[#ccff00]/25'
-                    : 'text-white/50 hover:text-white/80'
-                }`}>
-                  <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
-                </div>
-                {isActive && (
-                  <span className="text-[9px] font-bold text-[#ccff00] leading-none">{label}</span>
-                )}
-                {id === 'recordatorios' && pendingFollowUpsCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-[#0f1117] dark:ring-[#0f1117]" />
-                )}
-              </button>
-            );
-          })}
+          {/* ── Left: Reportes ── */}
+          <NavButton id="gestion" label="Reportes" icon={LayoutList} />
 
-          {/* Center FAB */}
+          {/* ═══ CENTER: FAB (+) ═══ */}
           <button
             onClick={onOpenNuevoReporte}
-            className="w-14 h-14 -mt-6 flex items-center justify-center rounded-full bg-[#ccff00] text-slate-900 shadow-xl shadow-[#ccff00]/20 ring-4 ring-[#0f1117]/40 active:scale-95 transition-all"
+            className="w-[52px] h-[52px] -mt-7 flex items-center justify-center rounded-full bg-[#ccff00] text-[#0f1117] shadow-xl shadow-[#ccff00]/30 ring-[3px] ring-[#161923] active:scale-90 transition-transform"
           >
             <Plus className="w-7 h-7" strokeWidth={3} />
           </button>
 
-          {/* Historial */}
-          <button
-            onClick={() => handleTab('historial')}
-            className="relative flex flex-col items-center justify-center gap-0.5 transition-all"
-          >
-            <div className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all duration-200 ${
-              activeTab === 'historial'
-                ? 'bg-[#ccff00] text-slate-900 shadow-lg shadow-[#ccff00]/25'
-                : 'text-white/50 hover:text-white/80'
-            }`}>
-              <History className="w-5 h-5" strokeWidth={activeTab === 'historial' ? 2.5 : 2} />
-            </div>
-            {activeTab === 'historial' && (
-              <span className="text-[9px] font-bold text-[#ccff00] leading-none">Historial</span>
-            )}
-          </button>
+          {/* ── Right: Seguimiento ── */}
+          <NavButton id="recordatorios" label="Seguimiento" icon={Clock} badge={pendingFollowUpsCount} />
 
-          {/* More */}
+          {/* ── Right: Más ── */}
           <button
             onClick={() => setIsMoreOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-0.5 transition-all"
+            className="flex flex-col items-center justify-center"
           >
-            <div className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all duration-200 ${
+            <div className={`w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-200 ${
               isMoreActive
-                ? 'bg-[#ccff00] text-slate-900 shadow-lg shadow-[#ccff00]/25'
-                : 'text-white/50 hover:text-white/80'
+                ? 'bg-[#ccff00] text-[#0f1117] shadow-lg shadow-[#ccff00]/30'
+                : 'text-slate-400 dark:text-white/40'
             }`}>
-              <MoreHorizontal className="w-5 h-5" />
+              <MoreHorizontal className="w-[22px] h-[22px]" strokeWidth={1.8} />
             </div>
           </button>
         </div>
       </nav>
 
-      {/* ────── MORE BOTTOMSHEET ────── */}
+      {/* ═══════ MORE BOTTOMSHEET ═══════ */}
       {isMoreOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
-          {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsMoreOpen(false)}
           />
-
-          {/* Sheet */}
-          <div className="relative rounded-t-[32px] overflow-hidden animate-in slide-in-from-bottom duration-300"
+          <div
+            className="relative rounded-t-[28px] overflow-hidden animate-in slide-in-from-bottom duration-300"
             style={{
-              background: 'rgba(26, 29, 39, 0.97)',
-              backdropFilter: 'blur(32px)',
-              WebkitBackdropFilter: 'blur(32px)',
-              borderTop: '1px solid rgba(255,255,255,0.06)',
+              background: '#1a1d27',
+              borderTop: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 bg-white/20 rounded-full" />
+              <div className="w-10 h-1 bg-white/15 rounded-full" />
             </div>
 
-            {/* Header sheet */}
-            <div className="flex items-center justify-between px-6 py-4">
-              <h3 className="font-bold text-white text-xl">Más opciones</h3>
-              <button
-                onClick={() => setIsMoreOpen(false)}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 text-white/70"
-              >
-                <X className="w-5 h-5" />
+            <div className="flex items-center justify-between px-6 py-3">
+              <h3 className="font-bold text-white text-lg">Más opciones</h3>
+              <button onClick={() => setIsMoreOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/8 text-white/60">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Navigation items */}
-            <div className="px-5 space-y-2 pb-2">
+            <div className="px-5 space-y-2 pb-3">
+              {/* Historial */}
+              <button
+                onClick={() => handleTab('historial')}
+                className={`w-full flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all ${
+                  activeTab === 'historial'
+                    ? 'bg-[#ccff00]/12 border border-[#ccff00]/25 text-[#ccff00]'
+                    : 'bg-white/5 border border-white/5 text-white/70 active:bg-white/10'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  activeTab === 'historial' ? 'bg-[#ccff00] text-[#0f1117]' : 'bg-white/8'
+                }`}>
+                  <History className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold">Historial de Reportes</p>
+                  <p className="text-[11px] text-white/40 font-normal">Exportación y registros pasados</p>
+                </div>
+              </button>
+
+              {/* Clientes */}
               {userSession?.rol?.includes('Administrador') && (
                 <button
                   onClick={() => handleTab('clientes')}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all ${
+                  className={`w-full flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all ${
                     activeTab === 'clientes'
-                      ? 'bg-[#ccff00]/15 border border-[#ccff00]/30 text-[#ccff00]'
-                      : 'bg-white/5 border border-white/5 text-white/80 hover:bg-white/10'
+                      ? 'bg-[#ccff00]/12 border border-[#ccff00]/25 text-[#ccff00]'
+                      : 'bg-white/5 border border-white/5 text-white/70 active:bg-white/10'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${
-                    activeTab === 'clientes' ? 'bg-[#ccff00] text-slate-900' : 'bg-white/10'
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    activeTab === 'clientes' ? 'bg-[#ccff00] text-[#0f1117]' : 'bg-white/8'
                   }`}>
-                    <Users className="w-6 h-6" />
+                    <Users className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="font-bold text-base">Directorio de Clientes</p>
-                    <p className="text-xs text-white/50 font-normal">Gestión completa de clientes</p>
+                    <p className="text-sm font-bold">Directorio de Clientes</p>
+                    <p className="text-[11px] text-white/40 font-normal">Gestión completa del catálogo</p>
                   </div>
                 </button>
               )}
             </div>
 
-            {/* Theme section */}
-            <div className="mx-5 mt-4 pt-4 border-t border-white/08">
-              <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3 px-1">Apariencia</p>
-              <div className="flex gap-2 bg-white/5 p-1.5 rounded-2xl border border-white/05">
+            {/* Theme */}
+            <div className="mx-5 mt-2 pt-4 border-t border-white/8">
+              <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3">Apariencia</p>
+              <div className="flex gap-1.5 bg-white/5 p-1 rounded-2xl border border-white/5">
                 {[
                   { value: 'light', label: 'Claro', Icon: Sun },
                   { value: 'dark', label: 'Oscuro', Icon: Moon },
@@ -184,10 +184,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   <button
                     key={value}
                     onClick={() => setTheme(value)}
-                    className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-xl text-xs font-bold transition-all ${
+                    className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl text-xs font-bold transition-all ${
                       theme === value
-                        ? 'bg-[#ccff00] text-slate-900 shadow-lg shadow-[#ccff00]/20'
-                        : 'text-white/50 hover:text-white/70'
+                        ? 'bg-[#ccff00] text-[#0f1117] shadow-lg shadow-[#ccff00]/20'
+                        : 'text-white/40'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -197,8 +197,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               </div>
             </div>
 
-            {/* Safe area */}
-            <div className="h-12" />
+            <div className="h-10" />
           </div>
         </div>
       )}
