@@ -13,11 +13,26 @@ const config: Config = {
         brand: {
           50: '#eef2ff',
           100: '#e0e7ff',
+          200: '#c7d2fe',
           500: '#6366f1',
           600: '#4f46e5',
           700: '#4338ca',
           800: '#3730a3',
           900: '#312e81',
+        },
+        // Dark mode surface system
+        dark: {
+          bg:       '#0f1117',   // app background
+          surface:  '#1a1d27',   // cards/panels  
+          elevated: '#222535',   // elevated cards
+          border:   '#2d3147',   // borders
+          muted:    '#3a3f5c',   // muted elements
+        },
+        // Lime accent (matches reference image)
+        lime: {
+          400: '#a3e635',
+          500: '#84cc16',
+          neon: '#ccff00',
         },
         surface: {
           light: '#ffffff',

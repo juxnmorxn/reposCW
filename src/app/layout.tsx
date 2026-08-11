@@ -37,8 +37,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body className="h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased font-sans">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <body className="h-full antialiased font-sans">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* Animated background blobs (only dark mode) */}
+          <div className="dark-bg-pattern" aria-hidden="true" />
           {children}
         </ThemeProvider>
       </body>

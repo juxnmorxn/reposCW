@@ -28,44 +28,39 @@ export const ReportCard: React.FC<ReportCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  // Icono según actividad
   const getActivityIcon = () => {
     if (reporte.tipo_actividad === 'soporte') {
-      return <Wrench className="w-5 h-5 text-brand-600" />;
+      return <Wrench className="w-5 h-5 text-brand-500" />;
     }
-    return <FileText className="w-5 h-5 text-slate-600 dark:text-slate-300" />;
+    return <FileText className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
   };
 
-  // Badges de Estado
   const getStatusBadge = () => {
     switch (reporte.estado) {
       case 'Completado':
-      case 'Resuelto':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Completado
           </span>
         );
       case 'En Proceso':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
             <Clock className="w-3.5 h-3.5 animate-spin" />
             En Proceso
           </span>
         );
       case 'Pendiente':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-900/30 text-amber-700 border border-amber-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
             <AlertOctagon className="w-3.5 h-3.5" />
             Pendiente
           </span>
         );
-      case 'No Completado':
-      case 'Rechazado':
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-700 border border-rose-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
             <XCircle className="w-3.5 h-3.5" />
             No Completado
           </span>
@@ -84,59 +79,61 @@ export const ReportCard: React.FC<ReportCardProps> = ({
     '';
 
   return (
-    <div 
-      className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-card dark:shadow-none hover:shadow-md transition-shadow cursor-pointer"
+    <div
+      className="group relative bg-white dark:bg-[#1a1d27] rounded-2xl border border-slate-200 dark:border-[#2d3147] p-4 shadow-sm hover:shadow-md dark:hover:shadow-none dark:hover:border-[#3a3f5c] transition-all cursor-pointer"
       onClick={() => onClick && onClick(reporte)}
     >
-      {/* Encabezado de la Tarjeta */}
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+        <div className="flex items-start gap-3 min-w-0">
+          {/* Activity Icon */}
+          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#222535] flex items-center justify-center shrink-0">
             {getActivityIcon()}
           </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-0.5 rounded-md border border-brand-100">
-                {reporte.tipo_actividad}
-              </span>
-              <span className="text-xs text-slate-400 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                {reporte.fecha_creacion}
-              </span>
-            </div>
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base mt-1 leading-snug">
+
+          <div className="min-w-0">
+            {/* Type badge */}
+            <span className="inline-flex items-center text-[10px] font-extrabold uppercase tracking-wider text-brand-500 bg-brand-500/10 px-2 py-0.5 rounded-md mb-1">
+              {reporte.tipo_actividad}
+            </span>
+
+            {/* Title */}
+            <h3 className="font-bold text-slate-900 dark:text-white text-sm leading-tight truncate">
               {title}
             </h3>
+
+            {/* Folio */}
+            {reporte.folio && (
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Folio: {reporte.folio}
+              </p>
+            )}
+
+            {/* Subtitle */}
+            {subtitle && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                {subtitle}
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {getStatusBadge()}
-        </div>
+        {/* Status */}
+        <div className="shrink-0">{getStatusBadge()}</div>
       </div>
 
-      {/* Descripción Breve / Problema */}
-      {subtitle && (
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2.5 line-clamp-2 leading-relaxed">
-          {subtitle}
-        </p>
-      )}
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-[#2d3147]">
+        <div className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
+          <Calendar className="w-3.5 h-3.5" />
+          <span>{reporte.fecha_creacion}</span>
+        </div>
 
-      {/* Acciones de la Tarjeta */}
-      <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-        <button
-          onClick={(e) => { e.stopPropagation(); onClick && onClick(reporte); }}
-          className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-brand-50 dark:bg-brand-900/30"
-        >
-          Previsualizar detalles
-        </button>
-
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {onEdit && (
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(reporte); }}
-              className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-brand-600 hover:bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors"
-              title="Editar Reporte"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 transition-colors"
+              title="Editar"
             >
               <Edit2 className="w-4 h-4" />
             </button>
@@ -144,8 +141,8 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           {onDelete && reporte.id && (
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(reporte.id!); }}
-              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:bg-rose-900/30 rounded-lg transition-colors"
-              title="Eliminar Reporte"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+              title="Eliminar"
             >
               <Trash2 className="w-4 h-4" />
             </button>

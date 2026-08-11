@@ -199,7 +199,7 @@ function DashboardContent() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col pb-20 md:pb-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col pb-28 md:pb-8">
       {/* BARRA SUPERIOR ÚNICA "REPOS ISP" */}
       <Header
         activeTab={activeTab}
@@ -230,6 +230,27 @@ function DashboardContent() {
         }}
         onOpenLogin={() => setIsLoginOpen(true)}
       />
+
+      {/* MOBILE MINI TOPBAR (visible only on mobile) */}
+      <div className="md:hidden sticky top-0 z-30 header-glass px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
+            <span className="text-white text-xs font-extrabold">ISP</span>
+          </div>
+          <div>
+            <p className="font-extrabold text-sm text-slate-900 dark:text-white leading-none">Repos ISP</p>
+            {userSession && (
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-none mt-0.5">{userSession.nombre}</p>
+            )}
+          </div>
+        </div>
+        {isTursoLive && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Live
+          </span>
+        )}
+      </div>
 
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-5 space-y-6 flex-1">
         {/* ======================================================== */}
