@@ -49,7 +49,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         }`}>
           <Icon className="w-[22px] h-[22px]" strokeWidth={isActive ? 2.5 : 1.8} />
         </div>
-        {badge && badge > 0 && (
+        {(badge ?? 0) > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-bold bg-rose-500 text-white rounded-full flex items-center justify-center ring-2 ring-white dark:ring-[#1a1d27]">{badge}</span>
         )}
       </button>
@@ -73,7 +73,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           <div className="relative w-[52px] h-11 mx-1 sm:mx-2 flex justify-center">
             <button
               onClick={onOpenNuevoReporte}
-              className="absolute -top-6 w-[56px] h-[56px] flex items-center justify-center rounded-full bg-slate-900 dark:bg-[#ccff00] text-white dark:text-[#0f1117] shadow-xl ring-[4px] ring-white dark:ring-[#161923] active:scale-95 transition-transform"
+              className="absolute -top-6 w-[56px] h-[56px] flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-700 text-white shadow-xl ring-[4px] ring-white dark:ring-[#161923] active:scale-95 transition-transform"
             >
               <Plus className="w-7 h-7" strokeWidth={3} />
             </button>
