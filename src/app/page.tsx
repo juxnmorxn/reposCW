@@ -12,6 +12,7 @@ import { ReportFormModal } from '@/components/ReportFormModal';
 import { ReportPreviewModal } from '@/components/ReportPreviewModal';
 import { PDFExportModal } from '@/components/PDFExportModal';
 import { LoginScreen } from '@/components/LoginScreen';
+import { CSVUploader } from '@/components/CSVUploader';
 import {
   Plus,
   FileDown,
@@ -227,11 +228,16 @@ export default function DashboardPage() {
                 <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Resumen Ejecutivo
                 </h2>
-                {userSession && (
-                  <span className="text-xs font-semibold text-brand-600">
-                    Usuario: {userSession.nombre}
-                  </span>
-                )}
+                <div className="flex items-center gap-3">
+                  {userSession?.rol?.includes('Administrador') && (
+                    <CSVUploader />
+                  )}
+                  {userSession && (
+                    <span className="text-xs font-semibold text-brand-600">
+                      Usuario: {userSession.nombre}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-card flex items-center justify-between">

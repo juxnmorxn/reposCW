@@ -54,3 +54,17 @@ export interface TursoConfig {
   authToken?: string;
   isLive: boolean;
 }
+
+export interface Cliente {
+  id?: number;
+  folio?: string;
+  nombre: string;
+  telefono?: string;
+  ip?: string;
+  router?: string;
+  direccion?: string;
+  plan_internet?: string;
+  es_antena?: boolean;
+  activo?: boolean;
+  fecha_registro?: string;
+}

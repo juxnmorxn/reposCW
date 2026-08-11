@@ -1,5 +1,5 @@
 import { createClient, Client } from '@libsql/client';
-import { Reporte, ResultadoSeguimiento } from './types';
+import { Reporte, ResultadoSeguimiento, Cliente } from './types';
 
 let dbClient: Client | null = null;
 
@@ -32,6 +32,12 @@ CREATE TABLE IF NOT EXISTS clientes (
     folio TEXT UNIQUE,
     nombre TEXT NOT NULL,
     telefono TEXT,
+    ip TEXT,
+    router TEXT,
+    direccion TEXT,
+    plan_internet TEXT,
+    es_antena BOOLEAN DEFAULT 1,
+    activo BOOLEAN DEFAULT 1,
     fecha_registro DATE
 );
 
@@ -383,8 +389,14 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
       // Insertar o actualizar el cliente en la tabla clientes
       if (reporteFinal.nombre_cliente) {
         await client.execute({
-          sql: `INSERT OR IGNORE INTO clientes (folio, nombre, telefono, fecha_registro) VALUES (?, ?, ?, ?)`,
-          args: [reporteFinal.folio ?? null, reporteFinal.nombre_cliente, reporteFinal.telefono_cliente ?? null, getLocalDateString()]
+          sql: `INSERT OR IGNORE INTO clientes (folio, nombre, telefono, ip, fecha_registro, es_antena, activo) VALUES (?, ?, ?, ?, ?, 1, 1)`,
+          args: [
+            reporteFinal.folio ?? null, 
+            reporteFinal.nombre_cliente, 
+            reporteFinal.telefono_cliente ?? null, 
+            reporteFinal.ip_cliente ?? null, 
+            getLocalDateString()
+          ]
         });
       }
 
@@ -526,6 +538,92 @@ function parseReporteRow(row: any): Reporte {
     semana: Number(row.semana || 0),
     año: Number(row.año || 0),
   };
+}
+
+// -------------------------------------------------------------
+// OPERACIONES DE CLIENTES
+// -------------------------------------------------------------
+
+export async function upsertClientesMasivo(clientes: Cliente[]): Promise<{ insertados: number; actualizados: number }> {
+  const client = getDbClient();
+  if (!client) {
+    console.log('No Turso connection to upsert clients.');
+    return { insertados: 0, actualizados: 0 };
+  }
+
+  let insertados = 0;
+  let actualizados = 0;
+
+  for (const c of clientes) {
+    try {
+      const exists = await client.execute({
+        sql: `SELECT id FROM clientes WHERE folio = ? OR (nombre = ? AND ip = ?)`,
+        args: [c.folio || null, c.nombre, c.ip || null]
+      });
+
+      if (exists.rows && exists.rows.length > 0) {
+        // Update
+        await client.execute({
+          sql: `UPDATE clientes SET nombre=?, telefono=?, ip=?, router=?, direccion=?, plan_internet=?, es_antena=?, activo=? WHERE id=?`,
+          args: [
+            c.nombre, c.telefono || null, c.ip || null, c.router || null, c.direccion || null, 
+            c.plan_internet || null, c.es_antena ? 1 : 0, c.activo ? 1 : 0, 
+            exists.rows[0].id
+          ]
+        });
+        actualizados++;
+      } else {
+        // Insert
+        await client.execute({
+          sql: `INSERT INTO clientes (folio, nombre, telefono, ip, router, direccion, plan_internet, es_antena, activo, fecha_registro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            c.folio || null, c.nombre, c.telefono || null, c.ip || null, c.router || null, 
+            c.direccion || null, c.plan_internet || null, c.es_antena ? 1 : 0, c.activo ? 1 : 0, 
+            getLocalDateString()
+          ]
+        });
+        insertados++;
+      }
+    } catch (err) {
+      console.error('Error upserting cliente:', c.nombre, err);
+    }
+  }
+
+  return { insertados, actualizados };
+}
+
+export async function searchClientesActivos(query: string): Promise<Cliente[]> {
+  const client = getDbClient();
+  if (!client) return [];
+
+  const term = `%${query.toLowerCase()}%`;
+  
+  try {
+    const res = await client.execute({
+      sql: `SELECT * FROM clientes 
+            WHERE es_antena = 1 AND activo = 1 
+            AND (LOWER(nombre) LIKE ? OR LOWER(ip) LIKE ? OR LOWER(folio) LIKE ?)
+            ORDER BY nombre ASC
+            LIMIT 10`,
+      args: [term, term, term]
+    });
+
+    return res.rows.map(r => ({
+      id: Number(r.id),
+      folio: r.folio as string,
+      nombre: r.nombre as string,
+      telefono: r.telefono as string,
+      ip: r.ip as string,
+      router: r.router as string,
+      direccion: r.direccion as string,
+      plan_internet: r.plan_internet as string,
+      es_antena: Boolean(r.es_antena),
+      activo: Boolean(r.activo)
+    }));
+  } catch (err) {
+    console.error('Error searching clients:', err);
+    return [];
+  }
 }
 
 export async function validateUserInDb(

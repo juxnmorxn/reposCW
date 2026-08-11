@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Reporte, TipoActividad, EstadoReporte } from '@/lib/types';
+import { Reporte, TipoActividad, EstadoReporte, Cliente } from '@/lib/types';
 import { uploadEvidenceFile } from '@/lib/drive';
 import { getLocalDateString } from '@/lib/db';
+import { ClientAutocomplete } from './ClientAutocomplete';
 import {
   X,
   Plus,
@@ -273,14 +274,17 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Nombre del Cliente / Ubicación</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. Juan Pérez - Col. Centro"
+                  <ClientAutocomplete
+                    label="Nombre del Cliente / Ubicación"
+                    placeholder="Escribe para buscar (Nombre, IP o Folio)..."
                     value={nombreCliente}
-                    onChange={(e) => setNombreCliente(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    onChange={(val) => setNombreCliente(val)}
+                    onSelectClient={(c) => {
+                      setNombreCliente(`${c.nombre} ${c.direccion ? `- ${c.direccion}` : ''}`.trim());
+                      if (c.folio) setFolio(c.folio);
+                      if (c.ip) setIpCliente(c.ip);
+                      if (c.telefono) setTelefonoCliente(c.telefono);
+                    }}
                   />
                 </div>
               </div>
