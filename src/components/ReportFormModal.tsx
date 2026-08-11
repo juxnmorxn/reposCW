@@ -168,25 +168,25 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-modal overflow-hidden flex flex-col max-h-[90vh] my-auto animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-modal overflow-hidden flex flex-col max-h-[90vh] my-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Encabezado Modal */}
-        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center font-bold">
               <Plus className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-slate-900 text-base sm:text-lg">
+              <h2 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg">
                 {editingReporte ? 'Editar Reporte de Actividad' : 'Nuevo Reporte'}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Selecciona la categoría y completa los campos correspondientes.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-200 transition-colors"
+            className="text-slate-400 hover:text-slate-700 dark:text-slate-200 p-1.5 rounded-xl hover:bg-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -196,7 +196,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
         <form onSubmit={handleSubmitForm} className="p-5 overflow-y-auto space-y-5 flex-1">
           {/* Selector de Tipo de Actividad (Tab Pills) */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-2">
               Tipo de Actividad
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -214,7 +214,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                     className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition-all ${
                       isSelected
                         ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        : 'bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:bg-slate-800'
                     }`}
                   >
                     <IconComp className="w-4 h-4" />
@@ -228,7 +228,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
           {/* Fila General: Fecha y Estado */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
                 Fecha de Registro
               </label>
               <input
@@ -236,15 +236,15 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                 required
                 value={fechaCreacion}
                 onChange={(e) => setFechaCreacion(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Estado</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Estado</label>
               <select
                 value={estado}
                 onChange={(e) => setEstado(e.target.value as EstadoReporte)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
               >
                 <option value="Pendiente">⏳ Pendiente</option>
                 <option value="En Proceso">🔄 En Proceso</option>
@@ -256,21 +256,21 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
           {/* CAMPOS DINÁMICOS SEGÚN TIPO DE ACTIVIDAD */}
           {tipoActividad === 'soporte' && (
-            <div className="space-y-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
+            <div className="space-y-4 bg-slate-50 dark:bg-slate-900/50/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
               <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
                 <Wrench className="w-4 h-4" /> Datos del Cliente y Soporte Técnico
               </h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Folio</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Folio</label>
                   <input
                     type="text"
                     required
                     placeholder="Ej. F-1234"
                     value={folio}
                     onChange={(e) => setFolio(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div className="sm:col-span-2">
@@ -291,109 +291,109 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Teléfono</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Teléfono</label>
                   <input
                     type="text"
                     placeholder="Número de contacto"
                     value={telefonoCliente}
                     onChange={(e) => setTelefonoCliente(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Dirección IP</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Dirección IP</label>
                   <input
                     type="text"
                     placeholder="Ej. 192.168.1.10"
                     value={ipCliente}
                     onChange={(e) => setIpCliente(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Equipo de RX</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Equipo de RX</label>
                   <input
                     type="text"
                     placeholder="Antena, Modem, OLT..."
                     value={equipoRx}
                     onChange={(e) => setEquipoRx(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Parámetros Actuales</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Parámetros Actuales</label>
                   <input
                     type="text"
                     placeholder="Latencia, DBm, Tx/Rx"
                     value={parametrosActuales}
                     onChange={(e) => setParametrosActuales(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Fecha Reporte (Creación de orden)</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Fecha Reporte (Creación de orden)</label>
                   <input
                     type="date"
                     value={fechaReporteCreado}
                     onChange={(e) => setFechaReporteCreado(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Fecha Reparación (Solución)</label>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Fecha Reparación (Solución)</label>
                   <input
                     type="date"
                     value={fechaSolucion}
                     onChange={(e) => setFechaSolucion(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Acción Realizada</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Acción Realizada</label>
                 <textarea
                   rows={2}
                   placeholder="Pasos técnicos ejecutados para resolver el problema..."
                   value={accionRealizada}
                   onChange={(e) => setAccionRealizada(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Parámetros Mejorados / Resultados</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Parámetros Mejorados / Resultados</label>
                 <input
                   type="text"
                   placeholder="Nuevos valores de latencia, DBm, etc."
                   value={parametrosMejorados}
                   onChange={(e) => setParametrosMejorados(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                 />
               </div>
             </div>
           )}
 
           {tipoActividad === 'libre' && (
-            <div className="space-y-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
+            <div className="space-y-4 bg-slate-50 dark:bg-slate-900/50/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
               <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4" /> Descripción de Actividad Libre
               </h3>
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Detalle de Actividad</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Detalle de Actividad</label>
                 <textarea
                   rows={4}
                   required
                   placeholder="Describe tus actividades del día (trabajo en campo, mantenimiento general, instalaciones, etc.)..."
                   value={descripcionActividad}
                   onChange={(e) => setDescripcionActividad(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
                 />
               </div>
             </div>
@@ -401,11 +401,11 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
           {/* SUBIDA DE EVIDENCIAS FOTOGRÁFICAS (GOOGLE DRIVE) */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
               Evidencias Fotográficas
             </label>
             <div className="flex items-center gap-3">
-              <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-xs font-semibold transition-colors">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold transition-colors">
                 {isUploading ? (
                   <Loader2 className="w-4 h-4 animate-spin text-brand-600" />
                 ) : (
@@ -420,7 +420,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                   className="hidden"
                 />
               </label>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
                 {evidenciaUrls.length} foto{evidenciaUrls.length !== 1 ? 's' : ''} cargada{evidenciaUrls.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -429,7 +429,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
             {evidenciaUrls.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 mt-2">
                 {evidenciaUrls.map((url, idx) => (
-                  <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-200 aspect-square bg-slate-100">
+                  <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 aspect-square bg-slate-100 dark:bg-slate-800">
                     <img
                       src={url}
                       alt={`Evidencia ${idx + 1}`}
@@ -451,11 +451,11 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
 
           {/* Botones de acción */}
-          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-xs sm:text-sm font-semibold hover:bg-slate-100 transition-colors"
+              className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-semibold hover:bg-slate-100 dark:bg-slate-800 transition-colors"
             >
               Cancelar
             </button>

@@ -33,7 +33,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
     if (reporte.tipo_actividad === 'soporte') {
       return <Wrench className="w-5 h-5 text-brand-600" />;
     }
-    return <FileText className="w-5 h-5 text-slate-600" />;
+    return <FileText className="w-5 h-5 text-slate-600 dark:text-slate-300" />;
   };
 
   // Badges de Estado
@@ -56,7 +56,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
         );
       case 'Pendiente':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-900/30 text-amber-700 border border-amber-200">
             <AlertOctagon className="w-3.5 h-3.5" />
             Pendiente
           </span>
@@ -65,7 +65,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
       case 'Rechazado':
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-700 border border-rose-200">
             <XCircle className="w-3.5 h-3.5" />
             No Completado
           </span>
@@ -85,18 +85,18 @@ export const ReportCard: React.FC<ReportCardProps> = ({
 
   return (
     <div 
-      className="bg-white rounded-2xl border border-slate-200 p-4 shadow-card hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-card dark:shadow-none hover:shadow-md transition-shadow cursor-pointer"
       onClick={() => onClick && onClick(reporte)}
     >
       {/* Encabezado de la Tarjeta */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
             {getActivityIcon()}
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-100">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-0.5 rounded-md border border-brand-100">
                 {reporte.tipo_actividad}
               </span>
               <span className="text-xs text-slate-400 flex items-center gap-1">
@@ -104,7 +104,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
                 {reporte.fecha_creacion}
               </span>
             </div>
-            <h3 className="font-bold text-slate-900 text-sm sm:text-base mt-1 leading-snug">
+            <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base mt-1 leading-snug">
               {title}
             </h3>
           </div>
@@ -117,16 +117,16 @@ export const ReportCard: React.FC<ReportCardProps> = ({
 
       {/* Descripción Breve / Problema */}
       {subtitle && (
-        <p className="text-xs sm:text-sm text-slate-600 mt-2.5 line-clamp-2 leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2.5 line-clamp-2 leading-relaxed">
           {subtitle}
         </p>
       )}
 
       {/* Acciones de la Tarjeta */}
-      <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+      <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
         <button
           onClick={(e) => { e.stopPropagation(); onClick && onClick(reporte); }}
-          className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-brand-50"
+          className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-brand-50 dark:bg-brand-900/30"
         >
           Previsualizar detalles
         </button>
@@ -135,7 +135,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           {onEdit && (
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(reporte); }}
-              className="p-1.5 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-brand-600 hover:bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors"
               title="Editar Reporte"
             >
               <Edit2 className="w-4 h-4" />
@@ -144,7 +144,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           {onDelete && reporte.id && (
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(reporte.id!); }}
-              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:bg-rose-900/30 rounded-lg transition-colors"
               title="Eliminar Reporte"
             >
               <Trash2 className="w-4 h-4" />

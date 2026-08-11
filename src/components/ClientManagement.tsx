@@ -28,8 +28,11 @@ export const ClientManagement: React.FC = () => {
 
   const [busqueda, setBusqueda] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState<'todos' | 'antena' | 'fibra'>('todos');
+  const [routerFiltro, setRouterFiltro] = useState<string>('todos');
   const [page, setPage] = useState(1);
   const limit = 50;
+
+  const [routersDisponibles, setRoutersDisponibles] = useState<string[]>([]);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -39,7 +42,11 @@ export const ClientManagement: React.FC = () => {
     setLoading(true);
     try {
       const offset = (page - 1) * limit;
-      const queryUrl = `/api/clientes?busqueda=${encodeURIComponent(busqueda)}&tipo=${tipoFiltro}&limit=${limit}&offset=${offset}`;
+      let queryUrl = `/api/clientes?busqueda=${encodeURIComponent(busqueda)}&tipo=${tipoFiltro}&limit=${limit}&offset=${offset}`;
+      if (routerFiltro !== 'todos') {
+        queryUrl += `&router=${encodeURIComponent(routerFiltro)}`;
+      }
+      
       const res = await fetch(queryUrl);
       if (res.ok) {
         const json = await res.json();
@@ -53,13 +60,29 @@ export const ClientManagement: React.FC = () => {
     }
   };
 
+  const fetchRouters = async () => {
+    try {
+      const res = await fetch('/api/clientes/routers');
+      if (res.ok) {
+        const json = await res.json();
+        setRoutersDisponibles(json.routers || []);
+      }
+    } catch (err) {
+      console.error('Error fetching routers', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchRouters();
+  }, []);
+
   useEffect(() => {
     setPage(1); // Reset page on new search/filter
-  }, [busqueda, tipoFiltro]);
+  }, [busqueda, tipoFiltro, routerFiltro]);
 
   useEffect(() => {
     loadData();
-  }, [busqueda, tipoFiltro, page]);
+  }, [busqueda, tipoFiltro, routerFiltro, page]);
 
   const handleSaveClient = async (data: Cliente) => {
     try {
@@ -116,13 +139,13 @@ export const ClientManagement: React.FC = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       {/* Header del módulo */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-card">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none">
         <div>
-          <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+          <h2 className="font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2">
             <Users className="w-5 h-5 text-brand-600" />
             Gestión de Clientes
           </h2>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Administra el catálogo completo de clientes para uso en reportes.
           </p>
         </div>
@@ -152,46 +175,59 @@ export const ClientManagement: React.FC = () => {
       </div>
 
       {/* Barra de Búsqueda y Filtros */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-card space-y-3">
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none space-y-3">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mt-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div className="relative flex-1 w-full xl:max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               placeholder="Buscar por nombre, folio, IP o teléfono..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs sm:text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
             />
           </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select
+              value={routerFiltro}
+              onChange={(e) => setRouterFiltro(e.target.value)}
+              className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            >
+              <option value="todos">Todos los Equipos</option>
+              {routersDisponibles.map((rb) => (
+                <option key={rb} value={rb}>{rb}</option>
+              ))}
+            </select>
 
-          <div className="flex bg-slate-100 p-1 rounded-xl shrink-0 w-full sm:w-auto">
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shrink-0 w-full sm:w-auto">
             <button
               onClick={() => setTipoFiltro('todos')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${tipoFiltro === 'todos' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${tipoFiltro === 'todos' ? 'bg-white dark:bg-slate-900 shadow text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'}`}
             >
               Todos
             </button>
             <button
               onClick={() => setTipoFiltro('antena')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${tipoFiltro === 'antena' ? 'bg-white shadow text-brand-700' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${tipoFiltro === 'antena' ? 'bg-white dark:bg-slate-900 shadow text-brand-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'}`}
             >
               <RadioTower className="w-3.5 h-3.5" /> Antena
             </button>
             <button
               onClick={() => setTipoFiltro('fibra')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${tipoFiltro === 'fibra' ? 'bg-white shadow text-violet-700' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${tipoFiltro === 'fibra' ? 'bg-white dark:bg-slate-900 shadow text-violet-700' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'}`}
             >
               <Wifi className="w-3.5 h-3.5" /> Fibra
             </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Lista de Clientes */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-          <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50/50">
+          <h3 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
             Catálogo de Clientes ({total})
           </h3>
           <button
@@ -206,18 +242,18 @@ export const ClientManagement: React.FC = () => {
         {loading ? (
           <div className="p-10 text-center">
             <Loader2 className="w-6 h-6 text-brand-600 animate-spin mx-auto" />
-            <p className="text-xs font-semibold text-slate-500 mt-2">Cargando clientes...</p>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-2">Cargando clientes...</p>
           </div>
         ) : clientes.length === 0 ? (
           <div className="p-10 text-center">
             <Users className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-sm font-bold text-slate-800">No se encontraron clientes</p>
-            <p className="text-xs text-slate-500 mt-1">Ajusta los filtros o intenta importar un archivo CSV.</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-100">No se encontraron clientes</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Ajusta los filtros o intenta importar un archivo CSV.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+              <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
                 <tr>
                   <th className="px-4 py-3">Cliente</th>
                   <th className="px-4 py-3">Contacto</th>
@@ -228,12 +264,12 @@ export const ClientManagement: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {clientes.map((cliente) => (
-                  <tr key={cliente.id} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={cliente.id} className="hover:bg-slate-50 dark:bg-slate-900/50/80 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
-                        <span className="font-bold text-slate-900">{cliente.nombre}</span>
+                        <span className="font-bold text-slate-900 dark:text-white">{cliente.nombre}</span>
                         {cliente.folio && (
-                          <span className="text-[11px] text-slate-500 font-medium">Folio: {cliente.folio}</span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Folio: {cliente.folio}</span>
                         )}
                         {cliente.direccion && (
                           <span className="text-[11px] text-slate-400 mt-0.5 truncate max-w-[200px]" title={cliente.direccion}>
@@ -250,7 +286,7 @@ export const ClientManagement: React.FC = () => {
                           <span className="text-slate-400 italic">Sin IP</span>
                         )}
                         {cliente.telefono ? (
-                          <span className="text-slate-600 mt-0.5">{cliente.telefono}</span>
+                          <span className="text-slate-600 dark:text-slate-300 mt-0.5">{cliente.telefono}</span>
                         ) : (
                           <span className="text-slate-400 mt-0.5 italic">Sin teléfono</span>
                         )}
@@ -267,7 +303,7 @@ export const ClientManagement: React.FC = () => {
                           {cliente.es_antena ? 'Antena' : 'Fibra (OLT)'}
                         </span>
                         {cliente.router && (
-                          <span className="text-[11px] text-slate-500 mt-1 truncate max-w-[150px]">
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 truncate max-w-[150px]">
                             {cliente.router}
                           </span>
                         )}
@@ -277,7 +313,7 @@ export const ClientManagement: React.FC = () => {
                       <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
                         cliente.activo 
                           ? 'bg-emerald-100 text-emerald-700' 
-                          : 'bg-slate-100 text-slate-500'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                       }`}>
                         {cliente.activo ? <ShieldCheck className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
                         {cliente.activo ? 'Activo' : 'Inactivo'}
@@ -290,7 +326,7 @@ export const ClientManagement: React.FC = () => {
                           className={`p-1.5 rounded-lg transition-colors ${
                             cliente.activo 
                               ? 'text-emerald-600 hover:bg-emerald-50' 
-                              : 'text-slate-400 hover:bg-slate-100 hover:text-slate-700'
+                              : 'text-slate-400 hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-700 dark:text-slate-200'
                           }`}
                           title={cliente.activo ? "Desactivar" : "Activar"}
                         >
@@ -301,14 +337,14 @@ export const ClientManagement: React.FC = () => {
                             setEditingClient(cliente);
                             setIsModalOpen(true);
                           }}
-                          className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 dark:bg-brand-900/30 rounded-lg transition-colors"
                           title="Editar"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => cliente.id && handleDeleteClient(cliente.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:bg-rose-900/30 rounded-lg transition-colors"
                           title="Eliminar"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -322,22 +358,22 @@ export const ClientManagement: React.FC = () => {
             
             {/* Controles de Paginación */}
             {total > limit && (
-              <div className="flex items-center justify-between px-5 py-4 border-t border-slate-200 bg-slate-50">
-                <span className="text-xs text-slate-500 font-medium">
+              <div className="flex items-center justify-between px-5 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   Mostrando {(page - 1) * limit + 1} a {Math.min(page * limit, total)} de {total}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-white"
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 disabled:opacity-50 disabled:hover:bg-white dark:bg-slate-900"
                   >
                     Anterior
                   </button>
                   <button
                     onClick={() => setPage((p) => p + 1)}
                     disabled={page * limit >= total}
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-white"
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 disabled:opacity-50 disabled:hover:bg-white dark:bg-slate-900"
                   >
                     Siguiente
                   </button>

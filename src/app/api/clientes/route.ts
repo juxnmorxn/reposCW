@@ -7,6 +7,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const busqueda = searchParams.get('busqueda') || '';
     const tipo = searchParams.get('tipo') || 'todos'; // 'todos', 'antena', 'fibra'
+    const routerFiltro = searchParams.get('router');
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
@@ -30,6 +31,11 @@ export async function GET(req: Request) {
       sql += ' AND es_antena = 0';
     }
 
+    if (routerFiltro && routerFiltro !== 'todos') {
+      sql += ' AND router = ?';
+      args.push(routerFiltro);
+    }
+
     sql += ' ORDER BY id DESC LIMIT ? OFFSET ?';
     args.push(limit, offset);
 
@@ -48,6 +54,10 @@ export async function GET(req: Request) {
       countSql += ' AND es_antena = 1';
     } else if (tipo === 'fibra') {
       countSql += ' AND es_antena = 0';
+    }
+    if (routerFiltro && routerFiltro !== 'todos') {
+      countSql += ' AND router = ?';
+      countArgs.push(routerFiltro);
     }
     const countRes = await client.execute({ sql: countSql, args: countArgs });
     const totalCount = countRes.rows[0]?.total ? Number(countRes.rows[0].total) : 0;

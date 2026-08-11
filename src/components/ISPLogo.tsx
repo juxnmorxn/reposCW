@@ -10,7 +10,7 @@ interface ISPLogoProps {
 export const ISPLogo: React.FC<ISPLogoProps> = ({ className = 'w-10 h-10', size = 40 }) => {
   return (
     <div
-      className={`rounded-2xl overflow-hidden shadow-md shadow-brand-500/20 border border-slate-200/80 bg-white flex items-center justify-center shrink-0 ${className}`}
+      className={`rounded-2xl overflow-hidden shadow-md shadow-brand-500/20 border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900 flex items-center justify-center shrink-0 ${className}`}
       style={{ width: size, height: size }}
     >
       <img

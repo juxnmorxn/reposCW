@@ -44,23 +44,23 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-modal overflow-hidden border border-slate-100 p-6 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-modal overflow-hidden border border-slate-100 dark:border-slate-800 p-6 space-y-6 animate-in fade-in zoom-in-95 duration-200">
         {/* Encabezado con Logotipo ISP */}
         <div className="text-center space-y-2">
           <div className="flex justify-center">
             <ISPLogo size={52} />
           </div>
-          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Repos ISP Support
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Ingresa tus credenciales para acceder al sistema de reportes técnicos.
           </p>
         </div>
 
         {/* Mensaje de Error */}
         {errorMsg && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-center gap-2 text-xs text-rose-700 font-semibold">
+          <div className="bg-rose-50 dark:bg-rose-900/30 border border-rose-200 rounded-xl p-3 flex items-center gap-2 text-xs text-rose-700 font-semibold">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -69,7 +69,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Formulario de Login */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1">
               Usuario
             </label>
             <div className="relative">
@@ -80,13 +80,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="ej. jux"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1">
               Contraseña
             </label>
             <div className="relative">
@@ -97,7 +97,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
@@ -118,7 +118,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
         </form>
 
-        <div className="text-center pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+        <div className="text-center pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400">
           Acceso Exclusivo • Soporte Técnico Repos ISP
         </div>
       </div>

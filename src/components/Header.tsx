@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ISPLogo } from './ISPLogo';
 import { UserSession } from '@/lib/auth';
+import { useTheme } from 'next-themes';
 import { getMonthAndWeekLabel } from '@/lib/db';
 import {
   Database,
@@ -18,6 +19,9 @@ import {
   Layers,
   User,
   LogOut,
+  Moon,
+  Sun,
+  Monitor
 } from 'lucide-react';
 
 export type NavTab = 'dashboard' | 'crear' | 'gestion' | 'recordatorios' | 'historial' | 'clientes';
@@ -64,6 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   onOpenLogin,
 }) => {
+  const { theme, setTheme } = useTheme();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -91,14 +96,14 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-subtle">
+    <header className="sticky top-0 z-30 bg-white dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-subtle">
       <div className="max-w-7xl mx-auto px-4 py-2.5 sm:px-6 flex items-center justify-between gap-3">
         {/* IZQUIERDA: Isotipo vector ISP + Nombre Repos ISP + Insignia Turso DB */}
         <div className="flex items-center gap-2.5 shrink-0">
           <ISPLogo size={36} />
           <div>
             <div className="flex items-center gap-1.5">
-              <h1 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight leading-none">
+              <h1 className="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg tracking-tight leading-none">
                 Repos ISP
               </h1>
               {isTursoLive ? (
@@ -113,18 +118,18 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500 font-medium">Soporte Técnico & Redes</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Soporte Técnico & Redes</p>
           </div>
         </div>
 
         {/* CENTRO (DESKTOP): NAVBAR ÚNICA CON PESTAÑAS */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200">
+        <nav className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-200 dark:border-slate-700">
           <button
             onClick={() => onSelectTab('dashboard')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'dashboard'
-                ? 'bg-white text-brand-600 shadow-sm border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
@@ -136,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'crear'
                 ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20'
-                : 'bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200'
+                : 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 hover:bg-brand-100 border border-brand-200'
             }`}
           >
             <PlusCircle className="w-3.5 h-3.5" />
@@ -147,8 +152,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onSelectTab('gestion')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'gestion'
-                ? 'bg-white text-brand-600 shadow-sm border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
             }`}
           >
             <FolderKanban className="w-3.5 h-3.5" />
@@ -159,8 +164,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onSelectTab('recordatorios')}
             className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'recordatorios'
-                ? 'bg-white text-brand-600 shadow-sm border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
             }`}
           >
             <Bell className="w-3.5 h-3.5" />
@@ -177,8 +182,8 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => onSelectTab('clientes')}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 activeTab === 'clientes'
-                  ? 'bg-white text-brand-600 shadow-sm border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                  ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
               }`}
             >
               <User className="w-3.5 h-3.5" />
@@ -190,8 +195,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onSelectTab('historial')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'historial'
-                ? 'bg-white text-brand-600 shadow-sm border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -205,17 +210,17 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative" ref={popoverRef}>
             <button
               onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-800 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-100 transition-colors"
             >
               <Calendar className="w-4 h-4 text-brand-600" />
               <span>{getFechaLabel()}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             </button>
 
             {isDatePickerOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl border border-slate-200 shadow-modal p-3 z-50 space-y-3 animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-modal p-3 z-50 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
                     Filtro por Fecha
                   </span>
                   <span className="text-[11px] font-semibold text-brand-600">Actopan UTC-6</span>
@@ -230,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className={`py-1.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
                       modoFecha === 'diario'
                         ? 'bg-brand-600 text-white shadow-sm'
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                        : 'bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5" /> Hoy (Diario)
@@ -241,7 +246,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className={`py-1.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
                       modoFecha === 'fecha'
                         ? 'bg-brand-600 text-white shadow-sm'
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                        : 'bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <CalendarDays className="w-3.5 h-3.5" /> Por Fecha
@@ -252,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className={`py-1.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
                       modoFecha === 'mes'
                         ? 'bg-brand-600 text-white shadow-sm'
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                        : 'bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <Calendar className="w-3.5 h-3.5" /> Por Mes/Semana
@@ -266,7 +271,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className={`py-1.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
                       modoFecha === 'todos'
                         ? 'bg-brand-600 text-white shadow-sm'
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                        : 'bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <Layers className="w-3.5 h-3.5" /> Todo
@@ -274,8 +279,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
 
                 {modoFecha === 'fecha' && (
-                  <div className="pt-2 border-t border-slate-100">
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                       Selecciona la fecha:
                     </label>
                     <input
@@ -285,21 +290,21 @@ export const Header: React.FC<HeaderProps> = ({
                         onFechaExactaChange(e.target.value);
                         setIsDatePickerOpen(false);
                       }}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 cursor-pointer"
+                      className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 cursor-pointer"
                     />
                   </div>
                 )}
 
                 {modoFecha === 'mes' && (
-                  <div className="pt-2 border-t border-slate-100 space-y-2">
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                         Selecciona el Mes:
                       </label>
                       <select
                         value={mesSeleccionado}
                         onChange={(e) => onMesChange(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 cursor-pointer"
+                        className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 cursor-pointer"
                       >
                         {MESES.map((m) => (
                           <option key={m} value={m}>
@@ -310,7 +315,7 @@ export const Header: React.FC<HeaderProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                         Semana del Mes:
                       </label>
                       <div className="grid grid-cols-4 gap-1">
@@ -325,7 +330,7 @@ export const Header: React.FC<HeaderProps> = ({
                             className={`py-1 rounded-lg text-xs font-bold transition-all ${
                               semanaDelMes === s
                                 ? 'bg-brand-600 text-white'
-                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200'
                             }`}
                           >
                             Sem. {s}
@@ -343,29 +348,46 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-700 transition-colors"
+              className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 transition-colors"
               title={userSession ? userSession.nombre : 'Iniciar Sesión'}
             >
-              <User className="w-4 h-4 text-slate-600" />
+              <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
 
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-slate-200 shadow-modal p-3 z-50 space-y-2 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-modal p-3 z-50 space-y-2 animate-in fade-in zoom-in-95 duration-150">
                 {userSession ? (
                   <>
                     <div className="px-2 py-1">
-                      <p className="font-bold text-slate-900 text-xs sm:text-sm leading-tight">
+                      <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-tight">
                         {userSession.nombre}
                       </p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{userSession.rol}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{userSession.rol}</p>
                     </div>
-                    <div className="border-t border-slate-100 pt-1">
+
+                    {/* Selector de Tema */}
+                    <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tema visual</p>
+                      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                        <button onClick={() => setTheme('light')} className={`flex-1 flex justify-center py-1.5 rounded text-xs font-bold transition-all ${theme === 'light' ? 'bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`} title="Claro">
+                          <Sun className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => setTheme('dark')} className={`flex-1 flex justify-center py-1.5 rounded text-xs font-bold transition-all ${theme === 'dark' ? 'bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`} title="Oscuro">
+                          <Moon className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => setTheme('system')} className={`flex-1 flex justify-center py-1.5 rounded text-xs font-bold transition-all ${theme === 'system' ? 'bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`} title="Sistema">
+                          <Monitor className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
                           onLogout();
                         }}
-                        className="w-full text-left inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors"
+                        className="w-full text-left inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 dark:bg-rose-900/30 transition-colors"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         <span>Cerrar Sesión</span>
@@ -378,7 +400,7 @@ export const Header: React.FC<HeaderProps> = ({
                       setIsUserMenuOpen(false);
                       onOpenLogin();
                     }}
-                    className="w-full text-left inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-bold text-brand-600 hover:bg-brand-50 transition-colors"
+                    className="w-full text-left inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-bold text-brand-600 hover:bg-brand-50 dark:bg-brand-900/30 transition-colors"
                   >
                     <User className="w-3.5 h-3.5" />
                     <span>Iniciar Sesión</span>

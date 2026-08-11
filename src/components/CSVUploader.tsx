@@ -107,7 +107,7 @@ export const CSVUploader: React.FC<CSVUploaderProps> = ({ onUploadSuccess }) => 
         htmlFor="csv-upload"
         className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
           isUploading 
-            ? 'bg-slate-100 text-slate-400 pointer-events-none'
+            ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 pointer-events-none'
             : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200'
         }`}
       >

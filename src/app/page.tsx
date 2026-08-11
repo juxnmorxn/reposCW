@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Reporte, ResultadoSeguimiento } from '@/lib/types';
 import { getWeekAndYear, getLocalDateString, getMonthAndWeekLabel } from '@/lib/db';
 import { getActiveSession, clearActiveSession, UserSession } from '@/lib/auth';
@@ -33,7 +34,11 @@ import {
   Layers,
 } from 'lucide-react';
 
-export default function DashboardPage() {
+function DashboardContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeTabParam = searchParams.get('tab') as NavTab;
+
   const todayStr = getLocalDateString();
   const { semana: currentWeek, año: currentYear } = getWeekAndYear(todayStr);
   const { mesNombre: currentMonth, semanaMes: currentWeekOfMonth } = getMonthAndWeekLabel(todayStr);
@@ -41,7 +46,24 @@ export default function DashboardPage() {
   const [userSession, setUserSession] = useState<UserSession | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
+  const [activeTabLocal, setActiveTabLocal] = useState<NavTab>('dashboard');
+  
+  // Sincronizar estado local con la URL
+  useEffect(() => {
+    if (activeTabParam && ['dashboard', 'crear', 'gestion', 'recordatorios', 'historial', 'clientes'].includes(activeTabParam)) {
+      setActiveTabLocal(activeTabParam);
+    }
+  }, [activeTabParam]);
+
+  const activeTab = activeTabParam || activeTabLocal;
+
+  const handleTabChange = (tab: NavTab) => {
+    setActiveTabLocal(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    router.push(`/?${params.toString()}`);
+  };
+
   const [modoFecha, setModoFecha] = useState<'diario' | 'fecha' | 'mes' | 'todos'>('diario');
   const [fechaExacta, setFechaExacta] = useState<string>(todayStr);
   const [mesSeleccionado, setMesSeleccionado] = useState<string>(currentMonth);
@@ -112,11 +134,10 @@ export default function DashboardPage() {
   const handleSaveReporte = async (data: Omit<Reporte, 'id'> | Reporte) => {
     try {
       const payload: any = { ...data };
-      if (userSession?.nombre) {
-        payload.tecnico_asignado = payload.tecnico_asignado || userSession.nombre;
+      if (typeof payload.firma_cliente === 'string' && payload.firma_cliente.startsWith('data:image')) {
+        payload.firma_cliente = null;
       }
-
-      const method = 'id' in payload && payload.id ? 'PUT' : 'POST';
+      const method = 'id' in data && data.id ? 'PUT' : 'POST';
       const res = await fetch('/api/reportes', {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -125,7 +146,7 @@ export default function DashboardPage() {
 
       if (res.ok) {
         await loadData();
-        setActiveTab('gestion');
+        handleTabChange('gestion');
       }
     } catch (err) {
       console.error('Error guardando reporte:', err);
@@ -178,7 +199,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col pb-20 md:pb-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col pb-20 md:pb-8">
       {/* BARRA SUPERIOR ÚNICA "REPOS ISP" */}
       <Header
         activeTab={activeTab}
@@ -187,7 +208,7 @@ export default function DashboardPage() {
             setEditingReporte(null);
             setIsModalOpen(true);
           } else {
-            setActiveTab(tab);
+            handleTabChange(tab);
           }
         }}
         modoFecha={modoFecha}
@@ -225,7 +246,7 @@ export default function DashboardPage() {
             {/* TARJETAS KPI (SOLO EN DASHBOARD) */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <h2 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Resumen Ejecutivo
                 </h2>
                 <div className="flex items-center gap-3">
@@ -237,19 +258,19 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-card flex items-center justify-between">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold text-slate-500">Total Actividades</p>
-                    <h4 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">{total}</h4>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Actividades</p>
+                    <h4 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-1">{total}</h4>
                   </div>
-                  <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 flex items-center justify-center shrink-0">
                     <BarChart3 className="w-6 h-6" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-card flex items-center justify-between">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold text-slate-500">Completados</p>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Completados</p>
                     <h4 className="text-xl sm:text-2xl font-extrabold text-emerald-600 mt-1">{completados}</h4>
                   </div>
                   <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
@@ -257,22 +278,22 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-card flex items-center justify-between">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold text-slate-500">Pendientes</p>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Pendientes</p>
                     <h4 className="text-xl sm:text-2xl font-extrabold text-amber-600 mt-1">{pendientes}</h4>
                   </div>
-                  <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center shrink-0">
                     <Clock className="w-6 h-6" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-card flex items-center justify-between">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold text-slate-500">No Completados</p>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">No Completados</p>
                     <h4 className="text-xl sm:text-2xl font-extrabold text-rose-600 mt-1">{noCompletados}</h4>
                   </div>
-                  <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center shrink-0">
                     <XCircle className="w-6 h-6" />
                   </div>
                 </div>
@@ -280,13 +301,13 @@ export default function DashboardPage() {
             </div>
 
             {/* SECCIÓN RESUMEN DIARIO & BOTÓN EXPORTAR */}
-            <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-card">
+            <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none">
               <div>
-                <h3 className="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base flex items-center gap-2">
                   <CalendarIcon className="w-4 h-4 text-brand-600" />
                   Actividades del Día ({todayStr})
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {reportes.length} actividad{reportes.length !== 1 ? 'es' : ''} registrada{reportes.length !== 1 ? 's' : ''} hoy en Turso DB.
                 </p>
               </div>
@@ -305,17 +326,17 @@ export default function DashboardPage() {
             {/* LISTA DE ACTIVIDADES DEL DÍA */}
             <div className="space-y-4">
               {loading ? (
-                <div className="bg-white p-10 rounded-2xl border border-slate-200 text-center space-y-2">
+                <div className="bg-white dark:bg-slate-900 p-10 rounded-2xl border border-slate-200 dark:border-slate-700 text-center space-y-2">
                   <RefreshCw className="w-6 h-6 text-brand-600 animate-spin mx-auto" />
-                  <p className="text-xs font-semibold text-slate-500">Cargando actividades del día...</p>
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Cargando actividades del día...</p>
                 </div>
               ) : reportes.length === 0 ? (
-                <div className="bg-white p-10 rounded-2xl border border-slate-200 text-center space-y-3">
-                  <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                <div className="bg-white dark:bg-slate-900 p-10 rounded-2xl border border-slate-200 dark:border-slate-700 text-center space-y-3">
+                  <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
                     <Inbox className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-slate-800 text-sm">No hay actividades registradas hoy</h4>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">No hay actividades registradas hoy</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                     Aún no se han registrado actividades para el día de hoy ({todayStr}).
                   </p>
                   <button
@@ -357,12 +378,12 @@ export default function DashboardPage() {
         {/* ======================================================== */}
         {activeTab === 'gestion' && (
           <div className="space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-card">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none">
               <div>
-                <h2 className="font-bold text-slate-900 text-base sm:text-lg flex items-center gap-2">
+                <h2 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg flex items-center gap-2">
                   Gestión y Búsqueda de Reportes
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Filtra, busca, edita o elimina reportes almacenados en Turso DB.
                 </p>
               </div>
@@ -382,7 +403,7 @@ export default function DashboardPage() {
             </div>
 
             {/* BARRA DE FILTROS & BÚSQUEDA */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-card space-y-3">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none space-y-3">
               <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                 {/* Buscador */}
                 <div className="relative flex-1">
@@ -392,7 +413,7 @@ export default function DashboardPage() {
                     placeholder="Buscar por cliente, problema, equipo o técnico..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
 
@@ -402,7 +423,7 @@ export default function DashboardPage() {
                   <select
                     value={estadoFiltro}
                     onChange={(e) => setEstadoFiltro(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500 cursor-pointer"
+                    className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-brand-500 cursor-pointer"
                   >
                     <option value="todos">Todos los Estados</option>
                     <option value="Completado">Completados</option>
@@ -419,7 +440,7 @@ export default function DashboardPage() {
                   <select
                     value={tipoFiltro}
                     onChange={(e) => setTipoFiltro(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 cursor-pointer shadow-subtle"
+                    className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 cursor-pointer shadow-subtle"
                   >
                     <option value="todos">Todas las Categorías</option>
                     <option value="soporte">Soporte Técnico</option>
@@ -447,7 +468,7 @@ export default function DashboardPage() {
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                           tipoFiltro === cat.id
                             ? 'bg-brand-600 text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                         }`}
                       >
                         <IconComp className="w-3.5 h-3.5" />
@@ -462,7 +483,7 @@ export default function DashboardPage() {
             {/* LISTA COMPLETA DE REGISTROS */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-600">
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
                   Resultados encontrados ({reportes.length})
                 </span>
                 <button
@@ -475,17 +496,17 @@ export default function DashboardPage() {
               </div>
 
               {loading ? (
-                <div className="bg-white p-10 rounded-2xl border border-slate-200 text-center space-y-2">
+                <div className="bg-white dark:bg-slate-900 p-10 rounded-2xl border border-slate-200 dark:border-slate-700 text-center space-y-2">
                   <RefreshCw className="w-6 h-6 text-brand-600 animate-spin mx-auto" />
-                  <p className="text-xs font-semibold text-slate-500">Cargando reportes...</p>
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Cargando reportes...</p>
                 </div>
               ) : reportes.length === 0 ? (
-                <div className="bg-white p-10 rounded-2xl border border-slate-200 text-center space-y-3">
-                  <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                <div className="bg-white dark:bg-slate-900 p-10 rounded-2xl border border-slate-200 dark:border-slate-700 text-center space-y-3">
+                  <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
                     <Inbox className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-slate-800 text-sm">No se encontraron reportes</h4>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">No se encontraron reportes</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                     Ajusta los filtros de búsqueda o registra una nueva actividad.
                   </p>
                 </div>
@@ -517,11 +538,11 @@ export default function DashboardPage() {
         {/* ======================================================== */}
         {activeTab === 'recordatorios' && (
           <div className="space-y-5">
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-card">
-              <h2 className="font-bold text-slate-900 text-base sm:text-lg">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none">
+              <h2 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg">
                 Seguimiento de Calidad a Clientes
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Casos completados que requieren verificación telefónica de servicio técnico.
               </p>
             </div>
@@ -532,7 +553,7 @@ export default function DashboardPage() {
             />
 
             <div className="space-y-4">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Historial de Seguimientos Realizados
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -563,12 +584,12 @@ export default function DashboardPage() {
         {/* ======================================================== */}
         {activeTab === 'historial' && (
           <div className="space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-card">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none">
               <div>
-                <h2 className="font-bold text-slate-900 text-base sm:text-lg">
+                <h2 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg">
                   Historial de Reportes y Exportación PDF
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Consulta reportes por Mes o Semana del Mes y descárgalos en PDF.
                 </p>
               </div>
@@ -618,7 +639,7 @@ export default function DashboardPage() {
             setEditingReporte(null);
             setIsModalOpen(true);
           } else {
-            setActiveTab(tab);
+            handleTabChange(tab);
           }
         }}
         onOpenNuevoReporte={() => {
@@ -666,5 +687,17 @@ export default function DashboardPage() {
         onClose={() => setIsLoginOpen(false)}
       />
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="animate-spin w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full"></div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }

@@ -74,7 +74,7 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
 
   return (
     <div className="relative w-full" ref={wrapperRef}>
-      <label className="block text-xs font-medium text-slate-700 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">{label}</label>
       <div className="relative">
         <input
           type="text"
@@ -88,7 +88,7 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
           onFocus={() => {
             if (results.length > 0) setShowDropdown(true);
           }}
-          className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
         />
         {isLoading && (
           <Loader2 className="w-4 h-4 animate-spin text-brand-600 absolute right-3 top-2.5" />
@@ -96,15 +96,15 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
       </div>
 
       {showDropdown && results.length > 0 && (
-        <ul className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-100">
+        <ul className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-100">
           {results.map((c) => (
             <li
               key={c.id}
               onClick={() => handleSelect(c)}
-              className="px-3 py-2 hover:bg-slate-50 cursor-pointer flex flex-col"
+              className="px-3 py-2 hover:bg-slate-50 dark:bg-slate-900/50 cursor-pointer flex flex-col"
             >
-              <span className="text-sm font-bold text-slate-800">{c.nombre} {c.folio ? `(${c.folio})` : ''}</span>
-              <span className="text-[11px] text-slate-500 flex items-center gap-2">
+              <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{c.nombre} {c.folio ? `(${c.folio})` : ''}</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 {c.ip && <span className="text-brand-600 font-semibold">{c.ip}</span>}
                 {c.direccion && <span>• {c.direccion}</span>}
               </span>
