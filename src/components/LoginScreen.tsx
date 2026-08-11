@@ -16,8 +16,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   onLoginSuccess,
   onClose,
 }) => {
-  const [username, setUsername] = useState('jux');
-  const [password, setPassword] = useState('Juan1200');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -119,7 +119,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         </form>
 
         <div className="text-center pt-2 border-t border-slate-100 text-[11px] text-slate-400">
-          Repos ISP • Usuario: <span className="font-bold text-slate-700">jux</span> / Contraseña: <span className="font-bold text-slate-700">Juan1200</span>
+          Acceso Exclusivo • Soporte Técnico Repos ISP
         </div>
       </div>
     </div>

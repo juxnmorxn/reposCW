@@ -23,6 +23,7 @@ import {
 
 interface ReportCardProps {
   reporte: Reporte;
+  onClick?: (reporte: Reporte) => void;
   onEdit?: (reporte: Reporte) => void;
   onDelete?: (id: number) => void;
   onQuickStatusChange?: (id: number, nuevoEstado: any) => void;
@@ -30,11 +31,11 @@ interface ReportCardProps {
 
 export const ReportCard: React.FC<ReportCardProps> = ({
   reporte,
+  onClick,
   onEdit,
   onDelete,
   onQuickStatusChange,
 }) => {
-  const [expanded, setExpanded] = useState(false);
 
   // Icono según actividad
   const getActivityIcon = () => {
@@ -103,7 +104,10 @@ export const ReportCard: React.FC<ReportCardProps> = ({
     '';
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-card hover:shadow-md transition-shadow">
+    <div 
+      className="bg-white rounded-2xl border border-slate-200 p-4 shadow-card hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onClick && onClick(reporte)}
+    >
       {/* Encabezado de la Tarjeta */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
@@ -138,99 +142,19 @@ export const ReportCard: React.FC<ReportCardProps> = ({
         </p>
       )}
 
-      {/* Detalles desplegables */}
-      {expanded && (
-        <div className="mt-3 pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-700 bg-slate-50/70 p-3 rounded-xl">
-          {reporte.tecnico_asignado && (
-            <p className="flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-slate-400" />
-              <span className="font-semibold text-slate-900">Técnico:</span> {reporte.tecnico_asignado}
-            </p>
-          )}
-
-          {reporte.accion_realizada && (
-            <div>
-              <span className="font-semibold text-slate-900 block">Acción Realizada:</span>
-              <p className="text-slate-600 mt-0.5">{reporte.accion_realizada}</p>
-            </div>
-          )}
-
-          {reporte.parametros_mejorados && (
-            <div>
-              <span className="font-semibold text-slate-900 block">Parámetros Mejorados:</span>
-              <p className="text-emerald-700 font-medium mt-0.5">{reporte.parametros_mejorados}</p>
-            </div>
-          )}
-
-          {reporte.resultado_pruebas && (
-            <div>
-              <span className="font-semibold text-slate-900 block">Pruebas:</span>
-              <p className="text-slate-600 mt-0.5">{reporte.resultado_pruebas}</p>
-            </div>
-          )}
-
-          {reporte.resultado_seguimiento && (
-            <div>
-              <span className="font-semibold text-slate-900 block">Resultado de Seguimiento:</span>
-              <span className="inline-block mt-0.5 px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded-md">
-                {reporte.resultado_seguimiento}
-              </span>
-            </div>
-          )}
-
-          {reporte.comentarios_adicionales && (
-            <div>
-              <span className="font-semibold text-slate-900 block">Comentarios:</span>
-              <p className="text-slate-600 italic mt-0.5">{reporte.comentarios_adicionales}</p>
-            </div>
-          )}
-
-          {/* Galería de Evidencias */}
-          {reporte.evidencia_urls && reporte.evidencia_urls.length > 0 && (
-            <div className="pt-2">
-              <span className="font-semibold text-slate-900 flex items-center gap-1 mb-1.5">
-                <ImageIcon className="w-3.5 h-3.5 text-brand-600" />
-                Evidencias Fotograficas ({reporte.evidencia_urls.length}):
-              </span>
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                {reporte.evidencia_urls.map((imgUrl, i) => (
-                  <a
-                    key={i}
-                    href={imgUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-16 h-16 rounded-lg overflow-hidden border border-slate-200 shrink-0 hover:opacity-90"
-                  >
-                    <img src={imgUrl} alt="Evidencia" className="w-full h-full object-cover" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Acciones de la Tarjeta */}
       <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
         <button
-          onClick={() => setExpanded(!expanded)}
+          onClick={(e) => { e.stopPropagation(); onClick && onClick(reporte); }}
           className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-brand-50"
         >
-          {expanded ? (
-            <>
-              Ocultar detalles <ChevronUp className="w-3.5 h-3.5" />
-            </>
-          ) : (
-            <>
-              Ver detalles completos <ChevronDown className="w-3.5 h-3.5" />
-            </>
-          )}
+          Previsualizar detalles
         </button>
 
         <div className="flex items-center gap-1.5">
           {onEdit && (
             <button
-              onClick={() => onEdit(reporte)}
+              onClick={(e) => { e.stopPropagation(); onEdit(reporte); }}
               className="p-1.5 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg transition-colors"
               title="Editar Reporte"
             >
@@ -239,7 +163,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           )}
           {onDelete && reporte.id && (
             <button
-              onClick={() => onDelete(reporte.id!)}
+              onClick={(e) => { e.stopPropagation(); onDelete(reporte.id!); }}
               className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
               title="Eliminar Reporte"
             >

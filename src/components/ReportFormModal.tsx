@@ -8,12 +8,8 @@ import {
   X,
   Plus,
   Upload,
-  Image as ImageIcon,
   Wrench,
-  Settings,
-  PhoneCall,
   FileText,
-  HelpCircle,
   Loader2,
   Check,
 } from 'lucide-react';
@@ -37,26 +33,19 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
   const [fechaCreacion, setFechaCreacion] = useState(todayStr);
   const [estado, setEstado] = useState<EstadoReporte>('Pendiente');
 
-  // Soporte
-  const [cliente, setCliente] = useState('');
-  const [problema, setProblema] = useState('');
+  // Soporte / Cliente
+  const [folio, setFolio] = useState('');
+  const [nombreCliente, setNombreCliente] = useState('');
+  const [telefonoCliente, setTelefonoCliente] = useState('');
+  const [abonadosDegradada, setAbonadosDegradada] = useState<string | number>('');
+  const [equipoRx, setEquipoRx] = useState('');
+  const [parametrosActuales, setParametrosActuales] = useState('');
   const [fechaReporteCreado, setFechaReporteCreado] = useState(todayStr);
-  const [tecnicoAsignado, setTecnicoAsignado] = useState('Ingeniero de Soporte');
   const [fechaSolucion, setFechaSolucion] = useState('');
   const [accionRealizada, setAccionRealizada] = useState('');
   const [parametrosMejorados, setParametrosMejorados] = useState('');
 
-  // Configuración
-  const [equipo, setEquipo] = useState('');
-  const [configuracionRealizada, setConfiguracionRealizada] = useState('');
-  const [resultadoPruebas, setResultadoPruebas] = useState('');
-
-  // Seguimiento
-  const [clienteSeguimiento, setClienteSeguimiento] = useState('');
-  const [motivoSeguimiento, setMotivoSeguimiento] = useState('');
-  const [resultadoSeguimiento, setResultadoSeguimiento] = useState('mejoro');
-
-  // General / Otros
+  // General / Libre
   const [descripcionActividad, setDescripcionActividad] = useState('');
   const [comentariosAdicionales, setComentariosAdicionales] = useState('');
 
@@ -70,19 +59,16 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
       setTipoActividad(editingReporte.tipo_actividad || 'soporte');
       setFechaCreacion(editingReporte.fecha_creacion || todayStr);
       setEstado((editingReporte.estado as EstadoReporte) || 'Pendiente');
-      setCliente(editingReporte.cliente || '');
-      setProblema(editingReporte.problema || '');
+      setFolio(editingReporte.folio || '');
+      setNombreCliente(editingReporte.nombre_cliente || '');
+      setTelefonoCliente(editingReporte.telefono_cliente || '');
+      setAbonadosDegradada(editingReporte.abonados_con_senal_degradada || '');
+      setEquipoRx(editingReporte.equipo_de_rx || '');
+      setParametrosActuales(editingReporte.parametros_actuales || '');
       setFechaReporteCreado(editingReporte.fecha_reporte_creado || todayStr);
-      setTecnicoAsignado(editingReporte.tecnico_asignado || 'Ingeniero de Soporte');
       setFechaSolucion(editingReporte.fecha_solucion || '');
       setAccionRealizada(editingReporte.accion_realizada || '');
       setParametrosMejorados(editingReporte.parametros_mejorados || '');
-      setEquipo(editingReporte.equipo || '');
-      setConfiguracionRealizada(editingReporte.configuracion_realizada || '');
-      setResultadoPruebas(editingReporte.resultado_pruebas || '');
-      setClienteSeguimiento(editingReporte.cliente_seguimiento || '');
-      setMotivoSeguimiento(editingReporte.motivo_seguimiento || '');
-      setResultadoSeguimiento(editingReporte.resultado_seguimiento || 'mejoro');
       setDescripcionActividad(editingReporte.descripcion_actividad || '');
       setComentariosAdicionales(editingReporte.comentarios_adicionales || '');
       setEvidenciaUrls(editingReporte.evidencia_urls || []);
@@ -95,19 +81,16 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
     setTipoActividad('soporte');
     setFechaCreacion(todayStr);
     setEstado('Pendiente');
-    setCliente('');
-    setProblema('');
+    setFolio('');
+    setNombreCliente('');
+    setTelefonoCliente('');
+    setAbonadosDegradada('');
+    setEquipoRx('');
+    setParametrosActuales('');
     setFechaReporteCreado(todayStr);
-    setTecnicoAsignado('Ingeniero de Soporte');
     setFechaSolucion('');
     setAccionRealizada('');
     setParametrosMejorados('');
-    setEquipo('');
-    setConfiguracionRealizada('');
-    setResultadoPruebas('');
-    setClienteSeguimiento('');
-    setMotivoSeguimiento('');
-    setResultadoSeguimiento('mejoro');
     setDescripcionActividad('');
     setComentariosAdicionales('');
     setEvidenciaUrls([]);
@@ -122,7 +105,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
     try {
       const uploadedResults = await Promise.all(
-        files.map((file) => uploadEvidenceFile(file, cliente || equipo || 'Evidencia'))
+        files.map((file) => uploadEvidenceFile(file, nombreCliente || folio || 'Evidencia'))
       );
       const newUrls = uploadedResults.map((res) => res.url);
       setEvidenciaUrls((prev) => [...prev, ...newUrls]);
@@ -155,23 +138,16 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
       }
 
       if (tipoActividad === 'soporte') {
-        payload.cliente = cliente;
-        payload.problema = problema;
+        payload.folio = folio;
+        payload.nombre_cliente = nombreCliente;
+        payload.telefono_cliente = telefonoCliente;
+        payload.abonados_con_senal_degradada = abonadosDegradada;
+        payload.equipo_de_rx = equipoRx;
+        payload.parametros_actuales = parametrosActuales;
         payload.fecha_reporte_creado = fechaReporteCreado;
-        payload.tecnico_asignado = tecnicoAsignado;
         payload.fecha_solucion = fechaSolucion || (estado === 'Completado' ? fechaCreacion : null);
         payload.accion_realizada = accionRealizada;
         payload.parametros_mejorados = parametrosMejorados;
-      } else if (tipoActividad === 'configuracion') {
-        payload.equipo = equipo;
-        payload.configuracion_realizada = configuracionRealizada;
-        payload.resultado_pruebas = resultadoPruebas;
-      } else if (tipoActividad === 'seguimiento') {
-        payload.cliente_seguimiento = clienteSeguimiento;
-        payload.motivo_seguimiento = motivoSeguimiento;
-        payload.resultado_seguimiento = resultadoSeguimiento;
-        payload.seguimiento_realizado = 1;
-        payload.fecha_seguimiento = fechaCreacion;
       } else {
         payload.descripcion_actividad = descripcionActividad;
       }
@@ -188,7 +164,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-modal overflow-hidden flex flex-col max-h-[90vh] my-auto">
+      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-modal overflow-hidden flex flex-col max-h-[90vh] my-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Encabezado Modal */}
         <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2.5">
@@ -197,7 +173,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
             </div>
             <div>
               <h2 className="font-bold text-slate-900 text-base sm:text-lg">
-                {editingReporte ? 'Editar Reporte de Actividad' : 'Nuevo Reporte Diario'}
+                {editingReporte ? 'Editar Reporte de Actividad' : 'Nuevo Reporte'}
               </h2>
               <p className="text-xs text-slate-500">
                 Selecciona la categoría y completa los campos correspondientes.
@@ -219,13 +195,10 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
               Tipo de Actividad
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {[
                 { id: 'soporte', label: 'Soporte', icon: Wrench },
-                { id: 'configuracion', label: 'Config.', icon: Settings },
-                { id: 'seguimiento', label: 'Seguimiento', icon: PhoneCall },
-                { id: 'administrativo', label: 'Admin', icon: FileText },
-                { id: 'otros', label: 'Otros', icon: HelpCircle },
+                { id: 'libre', label: 'Libre (Actividades / Otros)', icon: FileText },
               ].map((item) => {
                 const IconComp = item.icon;
                 const isSelected = tipoActividad === item.id;
@@ -234,11 +207,11 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => setTipoActividad(item.id as TipoActividad)}
-                    className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all ${
+                    className={\`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition-all \${
                       isSelected
                         ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20'
                         : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }`}
+                    }\`}
                   >
                     <IconComp className="w-4 h-4" />
                     {item.label}
@@ -281,47 +254,84 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
           {tipoActividad === 'soporte' && (
             <div className="space-y-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
               <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Wrench className="w-4 h-4" /> Datos de Soporte Técnico
+                <Wrench className="w-4 h-4" /> Datos del Cliente y Soporte Técnico
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Cliente / Ubicación</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Folio</label>
                   <input
                     type="text"
                     required
-                    placeholder="Ej. Hospital Central - Quirófano 2"
-                    value={cliente}
-                    onChange={(e) => setCliente(e.target.value)}
+                    placeholder="Ej. F-1234"
+                    value={folio}
+                    onChange={(e) => setFolio(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Técnico Asignado</label>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Nombre del Cliente / Ubicación</label>
                   <input
                     type="text"
-                    placeholder="Tú / Nombre del técnico"
-                    value={tecnicoAsignado}
-                    onChange={(e) => setTecnicoAsignado(e.target.value)}
+                    required
+                    placeholder="Ej. Juan Pérez - Col. Centro"
+                    value={nombreCliente}
+                    onChange={(e) => setNombreCliente(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Problema Reportado</label>
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="Describe la falla reportada por el cliente..."
-                  value={problema}
-                  onChange={(e) => setProblema(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Fecha Creación Orden</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Teléfono</label>
+                  <input
+                    type="text"
+                    placeholder="Número de contacto"
+                    value={telefonoCliente}
+                    onChange={(e) => setTelefonoCliente(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Abonados con señal degradada</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Cantidad de abonados"
+                    value={abonadosDegradada}
+                    onChange={(e) => setAbonadosDegradada(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Equipo de RX</label>
+                  <input
+                    type="text"
+                    placeholder="Antena, Modem, OLT..."
+                    value={equipoRx}
+                    onChange={(e) => setEquipoRx(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Parámetros Actuales</label>
+                  <input
+                    type="text"
+                    placeholder="Latencia, DBm, Tx/Rx"
+                    value={parametrosActuales}
+                    onChange={(e) => setParametrosActuales(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Fecha Reporte (Creación de orden)</label>
                   <input
                     type="date"
                     value={fechaReporteCreado}
@@ -330,7 +340,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Fecha Solución (Cierre)</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Fecha Reparación (Solución)</label>
                   <input
                     type="date"
                     value={fechaSolucion}
@@ -355,7 +365,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                 <label className="block text-xs font-medium text-slate-700 mb-1">Parámetros Mejorados / Resultados</label>
                 <input
                   type="text"
-                  placeholder="Ej. Latencia de red <15ms, SNR >40dB, impedancia corregida"
+                  placeholder="Nuevos valores de latencia, DBm, etc."
                   value={parametrosMejorados}
                   onChange={(e) => setParametrosMejorados(e.target.value)}
                   className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
@@ -364,98 +374,17 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
             </div>
           )}
 
-          {tipoActividad === 'configuracion' && (
+          {tipoActividad === 'libre' && (
             <div className="space-y-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
               <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Settings className="w-4 h-4" /> Datos de Configuración
-              </h3>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Equipo / Sistema</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej. Servidor PACS, Router Cisco C1100, Switch Nivel 3"
-                  value={equipo}
-                  onChange={(e) => setEquipo(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Configuración Realizada</label>
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="Parámetros modificados, actualización de firmware o reglas aplicadas..."
-                  value={configuracionRealizada}
-                  onChange={(e) => setConfiguracionRealizada(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Resultado de Pruebas</label>
-                <textarea
-                  rows={2}
-                  placeholder="Resultados obtenidas en las pruebas de verificación..."
-                  value={resultadoPruebas}
-                  onChange={(e) => setResultadoPruebas(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
-            </div>
-          )}
-
-          {tipoActividad === 'seguimiento' && (
-            <div className="space-y-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
-              <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
-                <PhoneCall className="w-4 h-4" /> Datos de Seguimiento
-              </h3>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Cliente a Contactar</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nombre del cliente o entidad"
-                  value={clienteSeguimiento}
-                  onChange={(e) => setClienteSeguimiento(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Motivo de Seguimiento</label>
-                <textarea
-                  rows={2}
-                  placeholder="Motivo de la llamada o caso a verificar..."
-                  value={motivoSeguimiento}
-                  onChange={(e) => setMotivoSeguimiento(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Resultado del Seguimiento</label>
-                <select
-                  value={resultadoSeguimiento}
-                  onChange={(e) => setResultadoSeguimiento(e.target.value)}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
-                >
-                  <option value="mejoro">✅ Mejoró / Funcionamiento Correcto</option>
-                  <option value="sigue_igual">⚠️ Sigue igual / Requiere nueva visita</option>
-                  <option value="no_contesto">📵 No contestó</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          {(tipoActividad === 'administrativo' || tipoActividad === 'otros') && (
-            <div className="space-y-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200">
-              <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-4 h-4" /> Descripción de Actividad
+                <FileText className="w-4 h-4" /> Descripción de Actividad Libre
               </h3>
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">Detalle de Actividad</label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   required
-                  placeholder="Reunión administrativa, elaboración de informes, inventario de componentes..."
+                  placeholder="Describe tus actividades del día (trabajo en campo, mantenimiento general, instalaciones, etc.)..."
                   value={descripcionActividad}
                   onChange={(e) => setDescripcionActividad(e.target.value)}
                   className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"
@@ -467,7 +396,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
           {/* SUBIDA DE EVIDENCIAS FOTOGRÁFICAS (GOOGLE DRIVE) */}
           <div className="space-y-2">
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Evidencias Fotográficas (Google Drive)
+              Evidencias Fotográficas
             </label>
             <div className="flex items-center gap-3">
               <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-xs font-semibold transition-colors">
@@ -497,7 +426,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                   <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-200 aspect-square bg-slate-100">
                     <img
                       src={url}
-                      alt={`Evidencia ${idx + 1}`}
+                      alt={\`Evidencia \${idx + 1}\`}
                       className="w-full h-full object-cover"
                     />
                     <button
@@ -520,7 +449,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
             </label>
             <input
               type="text"
-              placeholder="Cualquier nota extra relevante para el informe semanal..."
+              placeholder="Cualquier nota extra relevante..."
               value={comentariosAdicionales}
               onChange={(e) => setComentariosAdicionales(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 focus:ring-2 focus:ring-brand-500"

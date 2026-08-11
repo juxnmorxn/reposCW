@@ -27,24 +27,30 @@ export function getDbClient(): Client | null {
 
 // Estructura de tabla según el Brief de la aplicación
 const SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS clientes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    folio TEXT UNIQUE,
+    nombre TEXT NOT NULL,
+    telefono TEXT,
+    fecha_registro DATE
+);
+
 CREATE TABLE IF NOT EXISTS reportes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fecha_creacion DATE NOT NULL,
     tipo_actividad TEXT NOT NULL,
     
     -- Campos SOPORTE
-    cliente TEXT,
-    problema TEXT,
+    folio TEXT,
+    nombre_cliente TEXT,
+    telefono_cliente TEXT,
+    abonados_con_senal_degradada TEXT,
+    parametros_actuales TEXT,
+    equipo_de_rx TEXT,
     fecha_reporte_creado DATE,
-    tecnico_asignado TEXT,
     fecha_solucion DATE,
-    accion_realizada TEXT,
     parametros_mejorados TEXT,
-    
-    -- Campos CONFIGURACIÓN
-    equipo TEXT,
-    configuracion_realizada TEXT,
-    resultado_pruebas TEXT,
+    accion_realizada TEXT,
     
     -- Campos SEGUIMIENTO
     cliente_seguimiento TEXT,
@@ -66,7 +72,7 @@ CREATE TABLE IF NOT EXISTS reportes (
 
 CREATE INDEX IF NOT EXISTS idx_semana ON reportes(semana, año);
 CREATE INDEX IF NOT EXISTS idx_estado ON reportes(estado);
-CREATE INDEX IF NOT EXISTS idx_cliente ON reportes(cliente);
+CREATE INDEX IF NOT EXISTS idx_cliente_nombre ON reportes(nombre_cliente);
 
 CREATE TABLE IF NOT EXISTS configuracion_app (
     clave TEXT PRIMARY KEY,
@@ -92,6 +98,10 @@ export async function initDb(): Promise<boolean> {
   }
 
   try {
+    // Limpiamos tabla reportes para aplicar nuevos campos al migrar
+    await client.execute('DROP TABLE IF EXISTS reportes;'); 
+    await client.execute('DROP TABLE IF EXISTS clientes;');
+
     const statements = SCHEMA_SQL.split(';').filter((s) => s.trim().length > 0);
     for (const stmt of statements) {
       await client.execute(stmt);
@@ -99,11 +109,11 @@ export async function initDb(): Promise<boolean> {
 
     // Insertar usuario por defecto 'jux' / 'Juan1200' si no existe
     await client.execute({
-      sql: `INSERT OR IGNORE INTO usuarios (username, password, nombre, rol, fecha_creacion) VALUES (?, ?, ?, ?, ?)`,
+      sql: \`INSERT OR IGNORE INTO usuarios (username, password, nombre, rol, fecha_creacion) VALUES (?, ?, ?, ?, ?)\`,
       args: ['jux', 'Juan1200', 'Ing. JUX', 'Administrador & Soporte ISP', getLocalDateString()],
     });
 
-    console.log('Base de datos Turso e tabla usuarios inicializada con éxito.');
+    console.log('Base de datos Turso e tablas inicializadas con éxito.');
     return true;
   } catch (error) {
     console.error('Error al inicializar la base de datos Turso:', error);
@@ -111,15 +121,15 @@ export async function initDb(): Promise<boolean> {
   }
 }
 
-// Helper para obtener la fecha YYYY-MM-DD en la zona horaria local (ej. Actopan, Hidalgo UTC-6)
+// Helper para obtener la fecha YYYY-MM-DD en la zona horaria local
 export function getLocalDateString(d: Date = new Date()): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return \`\${year}-\${month}-\${day}\`;
 }
 
-// Helper para obtener el mes amigable (ej. Agosto) y la semana del mes (Semana 1..4)
+// Helper para obtener el mes amigable y la semana del mes
 export function getMonthAndWeekLabel(dateStr?: string): {
   mesNombre: string;
   semanaMes: number;
@@ -139,7 +149,7 @@ export function getMonthAndWeekLabel(dateStr?: string): {
     mesNombre,
     semanaMes,
     año,
-    labelCompleto: `${mesNombre} - Semana ${semanaMes} (${año})`,
+    labelCompleto: \`\${mesNombre} - Semana \${semanaMes} (\${año})\`,
   };
 }
 
@@ -182,12 +192,7 @@ function saveLocalReports(reports: Reporte[]) {
 
 // Datos semilla de demostración profesional para primera carga
 function getSeedReports(): Reporte[] {
-  const today = new Date();
-  const todayStr = getLocalDateString(today);
-  const twoDaysAgo = new Date(today);
-  twoDaysAgo.setDate(today.getDate() - 2);
-  const twoDaysAgoStr = getLocalDateString(twoDaysAgo);
-
+  const todayStr = getLocalDateString(new Date());
   const { semana, año } = getWeekAndYear(todayStr);
 
   const seeds: Reporte[] = [
@@ -195,66 +200,23 @@ function getSeedReports(): Reporte[] {
       id: 1,
       fecha_creacion: todayStr,
       tipo_actividad: 'soporte',
-      cliente: 'Hospital Central - Quirófano 3',
-      problema: 'Pérdida intermitente de señal en telemetría de monitores.',
+      folio: 'F-1001',
+      nombre_cliente: 'Hospital Central',
+      telefono_cliente: '555-0123',
+      abonados_con_senal_degradada: 12,
+      parametros_actuales: 'Latencia 150ms, Tx: -28dBm',
+      equipo_de_rx: 'OLT Huawei MA5800',
       fecha_reporte_creado: todayStr,
-      tecnico_asignado: 'Ing. Soporte (Tú)',
       fecha_solucion: todayStr,
-      accion_realizada: 'Reconfiguración de canal de frecuencia y reemplazo de conector RJ45 blindado.',
-      parametros_mejorados: 'Latencia reducida de 120ms a 14ms. Cero pérdidas de paquetes en 2 horas de prueba.',
-      descripcion_actividad: 'Atención prioritaria de soporte técnico en sitio.',
+      accion_realizada: 'Ajuste de empalme y cambio de conector',
+      parametros_mejorados: 'Latencia 12ms, Tx: -19dBm',
+      descripcion_actividad: 'Reparación de fibra óptica',
       estado: 'Completado',
       evidencia_urls: [],
       seguimiento_realizado: 0,
       semana,
       año,
-    },
-    {
-      id: 2,
-      fecha_creacion: twoDaysAgoStr,
-      tipo_actividad: 'soporte',
-      cliente: 'Clínica Santa María - Diagnóstico',
-      problema: 'Ruido electromagnético en sistema de electrocardiógrafo.',
-      fecha_reporte_creado: twoDaysAgoStr,
-      tecnico_asignado: 'Ing. Soporte (Tú)',
-      fecha_solucion: twoDaysAgoStr,
-      accion_realizada: 'Calibración de tierra física y ajuste de filtro P-Pass a 60Hz.',
-      parametros_mejorados: 'Señal limpia SNR > 45dB.',
-      descripcion_actividad: 'Calibración técnica de equipo.',
-      estado: 'Completado',
-      evidencia_urls: [],
-      seguimiento_realizado: 0, // Pendiente de seguimiento (hace 2 días)
-      semana,
-      año,
-    },
-    {
-      id: 3,
-      fecha_creacion: todayStr,
-      tipo_actividad: 'configuracion',
-      equipo: 'Servidor PACS General',
-      configuracion_realizada: 'Actualización de firmware v4.2.1 y habilitación de compresión DICOM sin pérdidas.',
-      resultado_pruebas: 'Transferencia de imágenes médicas 35% más rápida. Pruebas superadas al 100%.',
-      descripcion_actividad: 'Mantenimiento programado de firmware.',
-      estado: 'Completado',
-      evidencia_urls: [],
-      seguimiento_realizado: 1,
-      semana,
-      año,
-    },
-    {
-      id: 4,
-      fecha_creacion: todayStr,
-      tipo_actividad: 'seguimiento',
-      cliente_seguimiento: 'Laboratorio Biomedic',
-      motivo_seguimiento: 'Verificación post-reparación de centrífuga de alta velocidad.',
-      resultado_seguimiento: 'mejoro',
-      descripcion_actividad: 'Llamada de control de calidad.',
-      estado: 'Completado',
-      evidencia_urls: [],
-      seguimiento_realizado: 1,
-      semana,
-      año,
-    },
+    }
   ];
 
   return seeds;
@@ -305,9 +267,9 @@ export async function fetchReportes(filters?: {
         args.push(filters.estado);
       }
       if (filters?.busqueda) {
-        query += ' AND (cliente LIKE ? OR problema LIKE ? OR descripcion_actividad LIKE ? OR equipo LIKE ?)';
-        const term = `%${filters.busqueda}%`;
-        args.push(term, term, term, term);
+        query += ' AND (nombre_cliente LIKE ? OR folio LIKE ? OR descripcion_actividad LIKE ?)';
+        const term = \`%\${filters.busqueda}%\`;
+        args.push(term, term, term);
       }
 
       query += ' ORDER BY fecha_creacion DESC, id DESC';
@@ -316,7 +278,6 @@ export async function fetchReportes(filters?: {
       return result.rows.map((row) => parseReporteRow(row));
     } catch (err: any) {
       if (err?.message?.includes('no such table') || err?.cause?.message?.includes('no such table')) {
-        console.log('Tabla reportes no existe en Turso. Creando esquema automáticamente...');
         await initDb();
         try {
           const retryResult = await client.execute({ sql: query, args });
@@ -358,11 +319,9 @@ export async function fetchReportes(filters?: {
     const q = filters.busqueda.toLowerCase();
     list = list.filter(
       (r) =>
-        r.cliente?.toLowerCase().includes(q) ||
-        r.problema?.toLowerCase().includes(q) ||
-        r.descripcion_actividad?.toLowerCase().includes(q) ||
-        r.equipo?.toLowerCase().includes(q) ||
-        r.tecnico_asignado?.toLowerCase().includes(q)
+        r.nombre_cliente?.toLowerCase().includes(q) ||
+        r.folio?.toLowerCase().includes(q) ||
+        r.descripcion_actividad?.toLowerCase().includes(q)
     );
   }
 
@@ -382,29 +341,29 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
   const client = getDbClient();
   if (client) {
     try {
-      const sql = `
+      const sql = \`
         INSERT INTO reportes (
-          fecha_creacion, tipo_actividad, cliente, problema, fecha_reporte_creado,
-          tecnico_asignado, fecha_solucion, accion_realizada, parametros_mejorados,
-          equipo, configuracion_realizada, resultado_pruebas, cliente_seguimiento,
-          motivo_seguimiento, resultado_seguimiento, descripcion_actividad, estado,
-          evidencia_urls, seguimiento_realizado, fecha_seguimiento, comentarios_adicionales,
-          semana, año
+          fecha_creacion, tipo_actividad, folio, nombre_cliente, telefono_cliente, 
+          abonados_con_senal_degradada, parametros_actuales, equipo_de_rx, 
+          fecha_reporte_creado, fecha_solucion, parametros_mejorados, accion_realizada,
+          cliente_seguimiento, motivo_seguimiento, resultado_seguimiento, 
+          descripcion_actividad, estado, evidencia_urls, seguimiento_realizado, 
+          fecha_seguimiento, comentarios_adicionales, semana, año
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
+      \`;
       const args: any[] = [
         reporteFinal.fecha_creacion,
         reporteFinal.tipo_actividad,
-        reporteFinal.cliente ?? null,
-        reporteFinal.problema ?? null,
+        reporteFinal.folio ?? null,
+        reporteFinal.nombre_cliente ?? null,
+        reporteFinal.telefono_cliente ?? null,
+        reporteFinal.abonados_con_senal_degradada ?? null,
+        reporteFinal.parametros_actuales ?? null,
+        reporteFinal.equipo_de_rx ?? null,
         reporteFinal.fecha_reporte_creado ?? null,
-        reporteFinal.tecnico_asignado ?? null,
         reporteFinal.fecha_solucion ?? null,
-        reporteFinal.accion_realizada ?? null,
         reporteFinal.parametros_mejorados ?? null,
-        reporteFinal.equipo ?? null,
-        reporteFinal.configuracion_realizada ?? null,
-        reporteFinal.resultado_pruebas ?? null,
+        reporteFinal.accion_realizada ?? null,
         reporteFinal.cliente_seguimiento ?? null,
         reporteFinal.motivo_seguimiento ?? null,
         reporteFinal.resultado_seguimiento ?? null,
@@ -417,6 +376,14 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
         reporteFinal.semana ?? semana,
         reporteFinal.año ?? año,
       ];
+
+      // Insertar o actualizar el cliente en la tabla clientes
+      if (reporteFinal.nombre_cliente) {
+        await client.execute({
+          sql: \`INSERT OR IGNORE INTO clientes (folio, nombre, telefono, fecha_registro) VALUES (?, ?, ?, ?)\`,
+          args: [reporteFinal.folio ?? null, reporteFinal.nombre_cliente, reporteFinal.telefono_cliente ?? null, getLocalDateString()]
+        });
+      }
 
       try {
         const res = await client.execute({ sql, args });
@@ -456,7 +423,7 @@ export async function updateReporte(id: number, data: Partial<Reporte>): Promise
       const args: any[] = [];
 
       keys.forEach((key) => {
-        setClauses.push(`${key} = ?`);
+        setClauses.push(\`\${key} = ?\`);
         let val = (data as any)[key];
         if (key === 'evidencia_urls' && Array.isArray(val)) {
           val = JSON.stringify(val);
@@ -468,7 +435,7 @@ export async function updateReporte(id: number, data: Partial<Reporte>): Promise
       });
 
       args.push(id);
-      const sql = `UPDATE reportes SET ${setClauses.join(', ')} WHERE id = ?`;
+      const sql = \`UPDATE reportes SET \${setClauses.join(', ')} WHERE id = ?\`;
       await client.execute({ sql, args });
       return true;
     } catch (err) {
@@ -531,17 +498,18 @@ function parseReporteRow(row: any): Reporte {
   return {
     id: Number(row.id),
     fecha_creacion: String(row.fecha_creacion || ''),
-    tipo_actividad: row.tipo_actividad,
-    cliente: row.cliente || undefined,
-    problema: row.problema || undefined,
+    tipo_actividad: row.tipo_actividad as any,
+    folio: row.folio || undefined,
+    nombre_cliente: row.nombre_cliente || undefined,
+    telefono_cliente: row.telefono_cliente || undefined,
+    abonados_con_senal_degradada: row.abonados_con_senal_degradada || undefined,
+    parametros_actuales: row.parametros_actuales || undefined,
+    equipo_de_rx: row.equipo_de_rx || undefined,
     fecha_reporte_creado: row.fecha_reporte_creado || undefined,
-    tecnico_asignado: row.tecnico_asignado || undefined,
     fecha_solucion: row.fecha_solucion || undefined,
-    accion_realizada: row.accion_realizada || undefined,
     parametros_mejorados: row.parametros_mejorados || undefined,
-    equipo: row.equipo || undefined,
-    configuracion_realizada: row.configuracion_realizada || undefined,
-    resultado_pruebas: row.resultado_pruebas || undefined,
+    accion_realizada: row.accion_realizada || undefined,
+    
     cliente_seguimiento: row.cliente_seguimiento || undefined,
     motivo_seguimiento: row.motivo_seguimiento || undefined,
     resultado_seguimiento: row.resultado_seguimiento || undefined,
@@ -565,7 +533,7 @@ export async function validateUserInDb(
     try {
       await initDb();
       const res = await client.execute({
-        sql: `SELECT username, nombre, rol FROM usuarios WHERE username = ? AND password = ?`,
+        sql: \`SELECT username, nombre, rol FROM usuarios WHERE username = ? AND password = ?\`,
         args: [username, pass],
       });
       if (res.rows && res.rows.length > 0) {

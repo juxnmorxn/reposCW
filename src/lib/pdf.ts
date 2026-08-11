@@ -2,14 +2,23 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Reporte } from './types';
 
+// Helper to remove emojis and non-Latin1 characters that break jsPDF Helvetica font
+const cleanForPDF = (str: string | undefined | null) => {
+  if (!str) return '-';
+  // Remove emojis and keep only ASCII + Latin1
+  return str
+    .replace(/[\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]/gu, '')
+    .replace(/[^\x20-\x7E\xA0-\xFF\n]/g, '')
+    .trim();
+};
+
 export function generateWeeklyReportPDF(
   reportes: Reporte[],
   semana: number,
-  año: number,
-  nombreIngeniero: string = 'Ingeniero de Soporte Técnico'
+  año: number
 ) {
   const doc = new jsPDF({
-    orientation: 'portrait',
+    orientation: 'landscape', // Better for tables with many columns
     unit: 'mm',
     format: 'a4',
   });
@@ -28,18 +37,18 @@ export function generateWeeklyReportPDF(
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Reporte de Actividades | Ingeniero: ${nombreIngeniero}`, 14, 18);
+  doc.text(`Reporte de Actividades`, 14, 18);
   doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth - 14, 18, { align: 'right' });
 
   y = 32;
 
-  // 2. RESUMEN EJECUTIVO (KPIS)
+  // 2. RESUMEN EJECUTIVO (KPIS) sin emojis
   const total = reportes.length;
-  const resueltos = reportes.filter((r) => r.estado === 'Resuelto').length;
+  const completados = reportes.filter((r) => r.estado === 'Completado' || r.estado === 'Resuelto').length;
   const pendientes = reportes.filter((r) => r.estado === 'Pendiente' || r.estado === 'En Proceso').length;
-  const rechazados = reportes.filter((r) => r.estado === 'Rechazado').length;
+  const noCompletados = reportes.filter((r) => r.estado === 'No Completado' || r.estado === 'Rechazado').length;
 
-  doc.setFillColor(248, 250, 252); // Slate 50
+  doc.setFillColor(248, 250, 252);
   doc.roundedRect(14, y, pageWidth - 28, 22, 3, 3, 'F');
   doc.setDrawColor(226, 232, 240);
   doc.roundedRect(14, y, pageWidth - 28, 22, 3, 3, 'S');
@@ -54,9 +63,9 @@ export function generateWeeklyReportPDF(
 
   const colWidth = (pageWidth - 36) / 4;
   doc.text(`Total Registros: ${total}`, 18, y + 14);
-  doc.text(`✅ Resueltos: ${resueltos}`, 18 + colWidth, y + 14);
-  doc.text(`⏳ Pendientes: ${pendientes}`, 18 + colWidth * 2, y + 14);
-  doc.text(`🚫 Rechazados: ${rechazados}`, 18 + colWidth * 3, y + 14);
+  doc.text(`Completados: ${completados}`, 18 + colWidth, y + 14);
+  doc.text(`Pendientes: ${pendientes}`, 18 + colWidth * 2, y + 14);
+  doc.text(`No Completados: ${noCompletados}`, 18 + colWidth * 3, y + 14);
 
   y += 30;
 
@@ -68,24 +77,34 @@ export function generateWeeklyReportPDF(
   y += 4;
 
   const tableData = reportes.map((r) => {
-    const tipoStr = r.tipo_actividad.toUpperCase();
-    const sujeto = r.cliente || r.equipo || r.cliente_seguimiento || 'General';
-    const detalle = r.problema || r.configuracion_realizada || r.motivo_seguimiento || r.descripcion_actividad || '-';
-    const solucion = r.accion_realizada || r.resultado_pruebas || r.resultado_seguimiento || '-';
+    const tipo = r.tipo_actividad.toUpperCase();
+    
+    let folioStr = r.folio ? `Folio: ${r.folio}` : '';
+    let clienteStr = r.nombre_cliente ? `${r.nombre_cliente}\nTel: ${r.telefono_cliente || '-'}` : '-';
+    
+    let diagnosticoStr = '-';
+    let solucionStr = '-';
+
+    if (r.tipo_actividad === 'soporte') {
+      diagnosticoStr = \`RX: \${r.equipo_de_rx || '-'}\nAbonados: \${r.abonados_con_senal_degradada || '-'}\nParam Actuales: \${r.parametros_actuales || '-'}\`;
+      solucionStr = \`Accion: \${r.accion_realizada || '-'}\nParam Mejorados: \${r.parametros_mejorados || '-'}\`;
+    } else {
+      solucionStr = r.descripcion_actividad || '-';
+    }
 
     return [
-      r.fecha_creacion,
-      tipoStr,
-      sujeto,
-      detalle,
-      solucion,
-      r.estado,
+      cleanForPDF(r.fecha_creacion),
+      cleanForPDF(\`\${folioStr}\\n[\${tipo}]\`),
+      cleanForPDF(clienteStr),
+      cleanForPDF(diagnosticoStr),
+      cleanForPDF(solucionStr),
+      cleanForPDF(r.estado),
     ];
   });
 
   autoTable(doc, {
     startY: y,
-    head: [['Fecha', 'Tipo', 'Cliente / Equipo', 'Problema / Solicitud', 'Acción / Resultado', 'Estado']],
+    head: [['Fecha', 'Folio / Tipo', 'Cliente / Ubicacion', 'Diagnostico Inicial', 'Accion / Solucion', 'Estado']],
     body: tableData,
     theme: 'grid',
     headStyles: {
@@ -98,24 +117,24 @@ export function generateWeeklyReportPDF(
     bodyStyles: {
       fontSize: 8,
       textColor: [51, 65, 85],
+      cellPadding: 3,
     },
     columnStyles: {
-      0: { cellWidth: 22, halign: 'center' },
-      1: { cellWidth: 24, fontStyle: 'bold' },
-      2: { cellWidth: 38 },
-      3: { cellWidth: 45 },
-      4: { cellWidth: 42 },
-      5: { cellWidth: 20, halign: 'center' },
+      0: { cellWidth: 20, halign: 'center' },
+      1: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
+      2: { cellWidth: 50 },
+      3: { cellWidth: 60 },
+      4: { cellWidth: 85 },
+      5: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
     },
     didParseCell: (data) => {
       if (data.section === 'body' && data.column.index === 5) {
         const estado = data.cell.raw as string;
-        if (estado === 'Resuelto') {
+        if (estado === 'Completado' || estado === 'Resuelto') {
           data.cell.styles.textColor = [16, 185, 129];
-          data.cell.styles.fontStyle = 'bold';
         } else if (estado === 'Pendiente' || estado === 'En Proceso') {
           data.cell.styles.textColor = [245, 158, 11];
-        } else if (estado === 'Rechazado') {
+        } else if (estado === 'No Completado' || estado === 'Rechazado') {
           data.cell.styles.textColor = [239, 68, 68];
         }
       }
@@ -130,7 +149,7 @@ export function generateWeeklyReportPDF(
   const reportesConFotos = reportes.filter((r) => r.evidencia_urls && r.evidencia_urls.length > 0);
 
   if (reportesConFotos.length > 0) {
-    if (y > 220) {
+    if (y > 170) {
       doc.addPage();
       y = 20;
     }
@@ -138,38 +157,35 @@ export function generateWeeklyReportPDF(
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.setTextColor(30, 41, 59);
-    doc.text('ANEXO DE EVIDENCIAS FOTOGRÁFICAS Y CAPTURAS', 14, y);
+    doc.text('ANEXO DE EVIDENCIAS FOTOGRAFICAS Y CAPTURAS', 14, y);
     y += 6;
 
     let posX = 14;
-    const thumbWidth = 45; // 45mm x 45mm cuadrícula limpia
+    const thumbWidth = 45;
     const thumbHeight = 45;
     const gap = 12;
 
     reportesConFotos.forEach((r) => {
-      const sujeto = r.cliente || r.equipo || 'Evidencia';
+      const sujeto = r.nombre_cliente || r.folio || 'Evidencia';
       (r.evidencia_urls || []).forEach((imgUrl, idx) => {
-        if (y + thumbHeight + 15 > 280) {
+        if (y + thumbHeight + 15 > 200) {
           doc.addPage();
           y = 20;
           posX = 14;
         }
 
-        // Si la imagen es una base64 data URL
         if (imgUrl.startsWith('data:image/')) {
           try {
             const format = imgUrl.includes('png') ? 'PNG' : 'JPEG';
             doc.addImage(imgUrl, format, posX, y, thumbWidth, thumbHeight);
 
-            // Marco del recuadro
             doc.setDrawColor(203, 213, 225);
             doc.rect(posX, y, thumbWidth, thumbHeight, 'S');
 
-            // Etiqueta del anexo
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(71, 85, 105);
-            doc.text(`${sujeto.substring(0, 20)} (${idx + 1})`, posX, y + thumbHeight + 4);
+            doc.text(cleanForPDF(\`\${sujeto.substring(0, 20)} (\${idx + 1})\`), posX, y + thumbHeight + 4);
           } catch (e) {
             console.warn('Error adjuntando imagen al PDF:', e);
           }
@@ -182,30 +198,7 @@ export function generateWeeklyReportPDF(
         }
       });
     });
-
-    if (posX !== 14) {
-      y += thumbHeight + 12;
-    }
   }
 
-  // 5. PIE DE FIRMA
-  if (y > 250) {
-    doc.addPage();
-    y = 30;
-  }
-
-  doc.setDrawColor(203, 213, 225);
-  doc.line(pageWidth / 2 - 40, y + 15, pageWidth / 2 + 40, y + 15);
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(51, 65, 85);
-  doc.text(nombreIngeniero, pageWidth / 2, y + 20, { align: 'center' });
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(148, 163, 184);
-  doc.text('Departamento de Soporte Técnico y Mantenimiento - Repos', pageWidth / 2, y + 24, { align: 'center' });
-
-  doc.save(`Repos_Reporte_Actividades_${new Date().toISOString().split('T')[0]}.pdf`);
+  doc.save(\`Repos_Reporte_Actividades_\${new Date().toISOString().split('T')[0]}.pdf\`);
 }

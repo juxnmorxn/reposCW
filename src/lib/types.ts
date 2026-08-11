@@ -1,4 +1,4 @@
-export type TipoActividad = 'soporte' | 'configuracion' | 'administrativo' | 'seguimiento' | 'otros';
+export type TipoActividad = 'soporte' | 'libre';
 
 export type EstadoReporte = 'Pendiente' | 'En Proceso' | 'Completado' | 'No Completado';
 
@@ -10,18 +10,16 @@ export interface Reporte {
   tipo_actividad: TipoActividad;
 
   // Campos SOPORTE
-  cliente?: string;
-  problema?: string;
+  folio?: string;
+  nombre_cliente?: string;
+  telefono_cliente?: string;
+  abonados_con_senal_degradada?: string | number;
+  parametros_actuales?: string;
+  equipo_de_rx?: string;
   fecha_reporte_creado?: string;
-  tecnico_asignado?: string;
   fecha_solucion?: string;
-  accion_realizada?: string;
   parametros_mejorados?: string;
-
-  // Campos CONFIGURACIÓN
-  equipo?: string;
-  configuracion_realizada?: string;
-  resultado_pruebas?: string;
+  accion_realizada?: string;
 
   // Campos SEGUIMIENTO
   cliente_seguimiento?: string;
@@ -29,7 +27,7 @@ export interface Reporte {
   resultado_seguimiento?: ResultadoSeguimiento | string;
 
   // Campos Generales
-  descripcion_actividad?: string;
+  descripcion_actividad?: string; // Usado para "libre" u "otros"
   estado: EstadoReporte | string;
   evidencia_urls?: string[];
   seguimiento_realizado?: boolean | number;

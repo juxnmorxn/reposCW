@@ -9,6 +9,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { FollowUpBanner } from '@/components/FollowUpBanner';
 import { ReportCard } from '@/components/ReportCard';
 import { ReportFormModal } from '@/components/ReportFormModal';
+import { ReportPreviewModal } from '@/components/ReportPreviewModal';
 import { PDFExportModal } from '@/components/PDFExportModal';
 import { LoginScreen } from '@/components/LoginScreen';
 import {
@@ -59,6 +60,10 @@ export default function DashboardPage() {
   // Modales
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReporte, setEditingReporte] = useState<Reporte | null>(null);
+  
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewReporte, setPreviewReporte] = useState<Reporte | null>(null);
+
   const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
 
   useEffect(() => {
@@ -327,6 +332,10 @@ export default function DashboardPage() {
                     <ReportCard
                       key={reporte.id}
                       reporte={reporte}
+                      onClick={(r) => {
+                        setPreviewReporte(r);
+                        setIsPreviewOpen(true);
+                      }}
                       onEdit={(r) => {
                         setEditingReporte(r);
                         setIsModalOpen(true);
@@ -483,6 +492,10 @@ export default function DashboardPage() {
                     <ReportCard
                       key={reporte.id}
                       reporte={reporte}
+                      onClick={(r) => {
+                        setPreviewReporte(r);
+                        setIsPreviewOpen(true);
+                      }}
                       onEdit={(r) => {
                         setEditingReporte(r);
                         setIsModalOpen(true);
@@ -526,6 +539,10 @@ export default function DashboardPage() {
                     <ReportCard
                       key={reporte.id}
                       reporte={reporte}
+                      onClick={(r) => {
+                        setPreviewReporte(r);
+                        setIsPreviewOpen(true);
+                      }}
                       onEdit={(r) => {
                         setEditingReporte(r);
                         setIsModalOpen(true);
@@ -567,6 +584,10 @@ export default function DashboardPage() {
                 <ReportCard
                   key={reporte.id}
                   reporte={reporte}
+                  onClick={(r) => {
+                    setPreviewReporte(r);
+                    setIsPreviewOpen(true);
+                  }}
                   onEdit={(r) => {
                     setEditingReporte(r);
                     setIsModalOpen(true);
@@ -603,6 +624,16 @@ export default function DashboardPage() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSaveReporte}
         editingReporte={editingReporte}
+      />
+
+      <ReportPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        reporte={previewReporte}
+        onEdit={(r) => {
+          setEditingReporte(r);
+          setIsModalOpen(true);
+        }}
       />
 
       {/* MODAL EXPORTAR PDF */}
