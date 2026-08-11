@@ -44,13 +44,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({
       >
         <div className={`w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-200 ${
           isActive
-            ? 'bg-[#ccff00] text-[#0f1117] shadow-lg shadow-[#ccff00]/30'
-            : 'text-slate-400 dark:text-white/40'
+            ? 'bg-slate-900 text-white dark:bg-[#ccff00] dark:text-[#0f1117] shadow-lg dark:shadow-[#ccff00]/30'
+            : 'text-slate-500 hover:text-slate-700 dark:text-white/40 dark:hover:text-white/70'
         }`}>
           <Icon className="w-[22px] h-[22px]" strokeWidth={isActive ? 2.5 : 1.8} />
         </div>
         {badge && badge > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-bold bg-rose-500 text-white rounded-full flex items-center justify-center ring-2 ring-[#1a1d27]">{badge}</span>
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-bold bg-rose-500 text-white rounded-full flex items-center justify-center ring-2 ring-white dark:ring-[#1a1d27]">{badge}</span>
         )}
       </button>
     );
@@ -59,16 +59,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   return (
     <>
       {/* ═══════ FLOATING BOTTOM NAV ═══════ */}
-      <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[88%] max-w-[360px]">
+      <nav className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-fit">
         <div
-          className="rounded-[26px] px-3 py-2.5 flex items-center justify-between"
-          style={{
-            background: 'rgba(22, 25, 35, 0.92)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.05) inset',
-          }}
+          className="rounded-[26px] px-3 py-2.5 flex items-center justify-between gap-1 sm:gap-3 bg-white/90 dark:bg-[#161923]/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-black/50"
         >
           {/* ── Left: Inicio ── */}
           <NavButton id="dashboard" label="Inicio" icon={Home} />
@@ -77,12 +70,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           <NavButton id="gestion" label="Reportes" icon={LayoutList} />
 
           {/* ═══ CENTER: FAB (+) ═══ */}
-          <button
-            onClick={onOpenNuevoReporte}
-            className="w-[52px] h-[52px] -mt-7 flex items-center justify-center rounded-full bg-[#ccff00] text-[#0f1117] shadow-xl shadow-[#ccff00]/30 ring-[3px] ring-[#161923] active:scale-90 transition-transform"
-          >
-            <Plus className="w-7 h-7" strokeWidth={3} />
-          </button>
+          <div className="relative w-[52px] h-11 mx-1 sm:mx-2 flex justify-center">
+            <button
+              onClick={onOpenNuevoReporte}
+              className="absolute -top-6 w-[56px] h-[56px] flex items-center justify-center rounded-full bg-slate-900 dark:bg-[#ccff00] text-white dark:text-[#0f1117] shadow-xl ring-[4px] ring-white dark:ring-[#161923] active:scale-95 transition-transform"
+            >
+              <Plus className="w-7 h-7" strokeWidth={3} />
+            </button>
+          </div>
 
           {/* ── Right: Seguimiento ── */}
           <NavButton id="recordatorios" label="Seguimiento" icon={Clock} badge={pendingFollowUpsCount} />
@@ -94,8 +89,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           >
             <div className={`w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-200 ${
               isMoreActive
-                ? 'bg-[#ccff00] text-[#0f1117] shadow-lg shadow-[#ccff00]/30'
-                : 'text-slate-400 dark:text-white/40'
+                ? 'bg-slate-900 text-white dark:bg-[#ccff00] dark:text-[#0f1117] shadow-lg dark:shadow-[#ccff00]/30'
+                : 'text-slate-500 hover:text-slate-700 dark:text-white/40 dark:hover:text-white/70'
             }`}>
               <MoreHorizontal className="w-[22px] h-[22px]" strokeWidth={1.8} />
             </div>
@@ -111,19 +106,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             onClick={() => setIsMoreOpen(false)}
           />
           <div
-            className="relative rounded-t-[28px] overflow-hidden animate-in slide-in-from-bottom duration-300"
-            style={{
-              background: '#1a1d27',
-              borderTop: '1px solid rgba(255,255,255,0.08)',
-            }}
+            className="relative rounded-t-[28px] overflow-hidden animate-in slide-in-from-bottom duration-300 bg-white dark:bg-[#1a1d27] border-t border-slate-200 dark:border-white/10"
           >
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 bg-white/15 rounded-full" />
+              <div className="w-10 h-1 bg-slate-300 dark:bg-white/15 rounded-full" />
             </div>
 
             <div className="flex items-center justify-between px-6 py-3">
-              <h3 className="font-bold text-white text-lg">Más opciones</h3>
-              <button onClick={() => setIsMoreOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/8 text-white/60">
+              <h3 className="font-bold text-slate-900 dark:text-white text-lg">Más opciones</h3>
+              <button onClick={() => setIsMoreOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white/60">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -134,18 +125,18 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 onClick={() => handleTab('historial')}
                 className={`w-full flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all ${
                   activeTab === 'historial'
-                    ? 'bg-[#ccff00]/12 border border-[#ccff00]/25 text-[#ccff00]'
-                    : 'bg-white/5 border border-white/5 text-white/70 active:bg-white/10'
+                    ? 'bg-slate-900 text-white dark:bg-[#ccff00]/12 dark:border dark:border-[#ccff00]/25 dark:text-[#ccff00]'
+                    : 'bg-slate-50 border border-slate-100 text-slate-700 dark:bg-white/5 dark:border-white/5 dark:text-white/70 active:bg-slate-100 dark:active:bg-white/10'
                 }`}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  activeTab === 'historial' ? 'bg-[#ccff00] text-[#0f1117]' : 'bg-white/8'
+                  activeTab === 'historial' ? 'bg-slate-800 dark:bg-[#ccff00] text-white dark:text-[#0f1117]' : 'bg-slate-200 dark:bg-white/8'
                 }`}>
                   <History className="w-5 h-5" />
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-bold">Historial de Reportes</p>
-                  <p className="text-[11px] text-white/40 font-normal">Exportación y registros pasados</p>
+                  <p className={`text-[11px] font-normal ${activeTab === 'historial' ? 'text-slate-300 dark:text-white/40' : 'text-slate-500 dark:text-white/40'}`}>Exportación y registros pasados</p>
                 </div>
               </button>
 
@@ -155,27 +146,27 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   onClick={() => handleTab('clientes')}
                   className={`w-full flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all ${
                     activeTab === 'clientes'
-                      ? 'bg-[#ccff00]/12 border border-[#ccff00]/25 text-[#ccff00]'
-                      : 'bg-white/5 border border-white/5 text-white/70 active:bg-white/10'
+                      ? 'bg-slate-900 text-white dark:bg-[#ccff00]/12 dark:border dark:border-[#ccff00]/25 dark:text-[#ccff00]'
+                      : 'bg-slate-50 border border-slate-100 text-slate-700 dark:bg-white/5 dark:border-white/5 dark:text-white/70 active:bg-slate-100 dark:active:bg-white/10'
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                    activeTab === 'clientes' ? 'bg-[#ccff00] text-[#0f1117]' : 'bg-white/8'
+                    activeTab === 'clientes' ? 'bg-slate-800 dark:bg-[#ccff00] text-white dark:text-[#0f1117]' : 'bg-slate-200 dark:bg-white/8'
                   }`}>
                     <Users className="w-5 h-5" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-bold">Directorio de Clientes</p>
-                    <p className="text-[11px] text-white/40 font-normal">Gestión completa del catálogo</p>
+                    <p className={`text-[11px] font-normal ${activeTab === 'clientes' ? 'text-slate-300 dark:text-white/40' : 'text-slate-500 dark:text-white/40'}`}>Gestión completa del catálogo</p>
                   </div>
                 </button>
               )}
             </div>
 
             {/* Theme */}
-            <div className="mx-5 mt-2 pt-4 border-t border-white/8">
-              <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-3">Apariencia</p>
-              <div className="flex gap-1.5 bg-white/5 p-1 rounded-2xl border border-white/5">
+            <div className="mx-5 mt-2 pt-4 border-t border-slate-200 dark:border-white/10">
+              <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-widest mb-3">Apariencia</p>
+              <div className="flex gap-1.5 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5">
                 {[
                   { value: 'light', label: 'Claro', Icon: Sun },
                   { value: 'dark', label: 'Oscuro', Icon: Moon },
@@ -186,8 +177,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                     onClick={() => setTheme(value)}
                     className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl text-xs font-bold transition-all ${
                       theme === value
-                        ? 'bg-[#ccff00] text-[#0f1117] shadow-lg shadow-[#ccff00]/20'
-                        : 'text-white/40'
+                        ? 'bg-white text-slate-900 shadow dark:bg-[#ccff00] dark:text-[#0f1117] dark:shadow-lg dark:shadow-[#ccff00]/20'
+                        : 'text-slate-500 hover:text-slate-700 dark:text-white/40 dark:hover:text-white/60'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
