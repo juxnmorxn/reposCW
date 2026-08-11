@@ -161,6 +161,26 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   </div>
                 </button>
               )}
+
+              {/* Contraseñas */}
+              <button
+                onClick={() => handleTab('contrasenas')}
+                className={`w-full flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all ${
+                  activeTab === 'contrasenas'
+                    ? 'bg-slate-900 text-white dark:bg-[#ccff00]/12 dark:border dark:border-[#ccff00]/25 dark:text-[#ccff00]'
+                    : 'bg-slate-50 border border-slate-100 text-slate-700 dark:bg-white/5 dark:border-white/5 dark:text-white/70 active:bg-slate-100 dark:active:bg-white/10'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  activeTab === 'contrasenas' ? 'bg-slate-800 dark:bg-[#ccff00] text-white dark:text-[#0f1117]' : 'bg-slate-200 dark:bg-white/8'
+                }`}>
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold">Gestión de Contraseñas</p>
+                  <p className={`text-[11px] font-normal ${activeTab === 'contrasenas' ? 'text-slate-300 dark:text-white/40' : 'text-slate-500 dark:text-white/40'}`}>Cuentas, Winbox, Antenas</p>
+                </div>
+              </button>
             </div>
 
             {/* Theme */}

@@ -95,6 +95,23 @@ CREATE TABLE IF NOT EXISTS usuarios (
     rol TEXT NOT NULL,
     fecha_creacion DATE
 );
+
+CREATE TABLE IF NOT EXISTS grupos_contrasenas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    fecha_creacion DATE
+);
+
+CREATE TABLE IF NOT EXISTS contrasenas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    grupo_id INTEGER NOT NULL,
+    titulo TEXT NOT NULL,
+    usuario TEXT NOT NULL,
+    contrasena TEXT NOT NULL,
+    descripcion TEXT,
+    fecha_creacion DATE,
+    FOREIGN KEY(grupo_id) REFERENCES grupos_contrasenas(id) ON DELETE CASCADE
+);
 `;
 
 export async function initDb(): Promise<boolean> {
@@ -660,4 +677,153 @@ export async function validateUserInDb(
     };
   }
   return null;
+}
+
+// -------------------------------------------------------------
+// OPERACIONES DE GESTIÓN DE CONTRASEÑAS (TURSO)
+// -------------------------------------------------------------
+
+import { GrupoContrasena, Contrasena } from './types';
+
+export async function fetchGruposContrasenas(): Promise<GrupoContrasena[]> {
+  const client = getDbClient();
+  if (!client) return [];
+  try {
+    const res = await client.execute('SELECT * FROM grupos_contrasenas ORDER BY nombre ASC');
+    return res.rows.map(r => ({
+      id: Number(r.id),
+      nombre: String(r.nombre),
+      fecha_creacion: r.fecha_creacion ? String(r.fecha_creacion) : undefined
+    }));
+  } catch (err) {
+    console.error('Error fetching grupos de contraseñas:', err);
+    return [];
+  }
+}
+
+export async function insertGrupoContrasena(nombre: string): Promise<GrupoContrasena | null> {
+  const client = getDbClient();
+  if (!client) return null;
+  try {
+    const fecha = getLocalDateString();
+    const res = await client.execute({
+      sql: 'INSERT INTO grupos_contrasenas (nombre, fecha_creacion) VALUES (?, ?)',
+      args: [nombre, fecha]
+    });
+    return { id: Number(res.lastInsertRowid), nombre, fecha_creacion: fecha };
+  } catch (err) {
+    console.error('Error insertando grupo de contraseñas:', err);
+    return null;
+  }
+}
+
+export async function updateGrupoContrasena(id: number, nombre: string): Promise<boolean> {
+  const client = getDbClient();
+  if (!client) return false;
+  try {
+    await client.execute({
+      sql: 'UPDATE grupos_contrasenas SET nombre = ? WHERE id = ?',
+      args: [nombre, id]
+    });
+    return true;
+  } catch (err) {
+    console.error('Error actualizando grupo de contraseñas:', err);
+    return false;
+  }
+}
+
+export async function deleteGrupoContrasena(id: number): Promise<boolean> {
+  const client = getDbClient();
+  if (!client) return false;
+  try {
+    await client.execute({
+      sql: 'DELETE FROM grupos_contrasenas WHERE id = ?',
+      args: [id]
+    });
+    return true;
+  } catch (err) {
+    console.error('Error eliminando grupo de contraseñas:', err);
+    return false;
+  }
+}
+
+export async function fetchContrasenas(grupo_id?: number): Promise<Contrasena[]> {
+  const client = getDbClient();
+  if (!client) return [];
+  try {
+    let sql = 'SELECT * FROM contrasenas';
+    const args: any[] = [];
+    if (grupo_id) {
+      sql += ' WHERE grupo_id = ?';
+      args.push(grupo_id);
+    }
+    sql += ' ORDER BY titulo ASC';
+    
+    const res = await client.execute({ sql, args });
+    return res.rows.map(r => ({
+      id: Number(r.id),
+      grupo_id: Number(r.grupo_id),
+      titulo: String(r.titulo),
+      usuario: String(r.usuario),
+      contrasena: String(r.contrasena),
+      descripcion: r.descripcion ? String(r.descripcion) : undefined,
+      fecha_creacion: r.fecha_creacion ? String(r.fecha_creacion) : undefined
+    }));
+  } catch (err) {
+    console.error('Error fetching contraseñas:', err);
+    return [];
+  }
+}
+
+export async function insertContrasena(data: Omit<Contrasena, 'id'>): Promise<Contrasena | null> {
+  const client = getDbClient();
+  if (!client) return null;
+  try {
+    const fecha = getLocalDateString();
+    const res = await client.execute({
+      sql: `INSERT INTO contrasenas (grupo_id, titulo, usuario, contrasena, descripcion, fecha_creacion) 
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [data.grupo_id, data.titulo, data.usuario, data.contrasena, data.descripcion || null, fecha]
+    });
+    return { ...data, id: Number(res.lastInsertRowid), fecha_creacion: fecha };
+  } catch (err) {
+    console.error('Error insertando contraseña:', err);
+    return null;
+  }
+}
+
+export async function updateContrasena(id: number, data: Partial<Contrasena>): Promise<boolean> {
+  const client = getDbClient();
+  if (!client) return false;
+  try {
+    const fields = [];
+    const args = [];
+    if (data.grupo_id !== undefined) { fields.push('grupo_id = ?'); args.push(data.grupo_id); }
+    if (data.titulo !== undefined) { fields.push('titulo = ?'); args.push(data.titulo); }
+    if (data.usuario !== undefined) { fields.push('usuario = ?'); args.push(data.usuario); }
+    if (data.contrasena !== undefined) { fields.push('contrasena = ?'); args.push(data.contrasena); }
+    if (data.descripcion !== undefined) { fields.push('descripcion = ?'); args.push(data.descripcion); }
+    
+    if (fields.length === 0) return true;
+    
+    args.push(id);
+    const sql = `UPDATE contrasenas SET ${fields.join(', ')} WHERE id = ?`;
+    await client.execute({ sql, args });
+    return true;
+  } catch (err) {
+    console.error('Error actualizando contraseña:', err);
+    return false;
+  }
+}
+
+export async function deleteContrasena(id: number): Promise<boolean> {
+  const client = getDbClient();
+  if (!client) return false;
+  try {
+    await client.execute({ sql: 'DELETE FROM contrasenas WHERE id = ?', args: [id] });
+    return true;
+  } catch (err) {
+    console.error('Error eliminando contraseña:', err);
+    return false;
+  }
 }

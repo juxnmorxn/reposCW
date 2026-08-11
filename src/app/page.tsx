@@ -14,6 +14,7 @@ import { ReportPreviewModal } from '@/components/ReportPreviewModal';
 import { PDFExportModal } from '@/components/PDFExportModal';
 import { LoginScreen } from '@/components/LoginScreen';
 import { ClientManagement } from '@/components/ClientManagement';
+import { PasswordManagement } from '@/components/PasswordManagement';
 import {
   Plus,
   FileDown,
@@ -50,7 +51,7 @@ function DashboardContent() {
   
   // Sincronizar estado local con la URL
   useEffect(() => {
-    if (activeTabParam && ['dashboard', 'crear', 'gestion', 'recordatorios', 'historial', 'clientes'].includes(activeTabParam)) {
+    if (activeTabParam && ['dashboard', 'crear', 'gestion', 'recordatorios', 'historial', 'clientes', 'contrasenas'].includes(activeTabParam)) {
       setActiveTabLocal(activeTabParam);
     }
   }, [activeTabParam]);
@@ -649,6 +650,13 @@ function DashboardContent() {
         {/* ======================================================== */}
         {activeTab === 'clientes' && userSession?.rol?.includes('Administrador') && (
           <ClientManagement />
+        )}
+
+        {/* ======================================================== */}
+        {/* VISTA 6: GESTIÓN DE CONTRASEÑAS                          */}
+        {/* ======================================================== */}
+        {activeTab === 'contrasenas' && (
+          <PasswordManagement />
         )}
       </main>
 

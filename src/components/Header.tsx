@@ -24,7 +24,7 @@ import {
   Monitor
 } from 'lucide-react';
 
-export type NavTab = 'dashboard' | 'crear' | 'gestion' | 'recordatorios' | 'historial' | 'clientes';
+export type NavTab = 'dashboard' | 'crear' | 'gestion' | 'recordatorios' | 'historial' | 'clientes' | 'contrasenas';
 
 interface HeaderProps {
   activeTab: NavTab;
@@ -190,6 +190,18 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Clientes</span>
             </button>
           )}
+
+          <button
+            onClick={() => onSelectTab('contrasenas')}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'contrasenas'
+                ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>Contraseñas</span>
+          </button>
 
           <button
             onClick={() => onSelectTab('historial')}

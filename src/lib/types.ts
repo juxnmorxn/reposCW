@@ -68,3 +68,19 @@ export interface Cliente {
   activo?: boolean;
   fecha_registro?: string;
 }
+
+export interface GrupoContrasena {
+  id?: number;
+  nombre: string;
+  fecha_creacion?: string;
+}
+
+export interface Contrasena {
+  id?: number;
+  grupo_id: number;
+  titulo: string;
+  usuario: string;
+  contrasena: string;
+  descripcion?: string;
+  fecha_creacion?: string;
+}
