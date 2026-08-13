@@ -701,11 +701,13 @@ export async function searchClientesActivos(query: string): Promise<Cliente[]> {
   try {
     const res = await client.execute({
       sql: `SELECT * FROM clientes 
-            WHERE es_antena = 1 AND activo = 1 
+            WHERE (activo IS NULL OR activo = 1)
             AND (LOWER(nombre) LIKE ? OR LOWER(ip) LIKE ? OR LOWER(folio) LIKE ?)
-            ORDER BY nombre ASC
-            LIMIT 10`,
-      args: [term, term, term]
+            ORDER BY 
+              CASE WHEN LOWER(ip) LIKE ? THEN 1 ELSE 2 END,
+              nombre ASC
+            LIMIT 12`,
+      args: [term, term, term, term]
     });
 
     return res.rows.map(r => ({
