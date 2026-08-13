@@ -259,12 +259,6 @@ function DashboardContent() {
         {/* ======================================================== */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
-            {/* Banner de Seguimientos Pendientes */}
-            <FollowUpBanner
-              pendingReportes={pendingFollowUps}
-              onMarcarSeguimiento={handleMarcarSeguimiento}
-            />
-
             {/* TARJETAS KPI (SOLO EN DASHBOARD) */}
             <div>
               <div className="flex items-center justify-between mb-3">

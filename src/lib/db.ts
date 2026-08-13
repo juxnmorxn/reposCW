@@ -353,6 +353,84 @@ export async function fetchReportes(filters?: {
   return list.sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime());
 }
 
+// Helper para insertar o actualizar un cliente sin duplicar registros
+async function upsertClientFromReport(
+  nombre?: string | null,
+  folio?: string | null,
+  telefono?: string | null,
+  ip?: string | null
+) {
+  if (!nombre && !folio) return;
+  const client = getDbClient();
+  if (!client) return;
+
+  try {
+    const cleanNombre = nombre ? nombre.trim() : null;
+    const cleanFolio = folio ? folio.trim() : null;
+    const cleanTelefono = telefono ? telefono.trim() : null;
+    const cleanIp = ip ? ip.trim() : null;
+
+    if (!cleanNombre && !cleanFolio) return;
+
+    let existingRow: any = null;
+
+    // Buscar por folio
+    if (cleanFolio) {
+      const byFolio = await client.execute({
+        sql: 'SELECT id, nombre, folio, telefono, ip FROM clientes WHERE folio = ? LIMIT 1',
+        args: [cleanFolio],
+      });
+      if (byFolio.rows.length > 0) {
+        existingRow = byFolio.rows[0];
+      }
+    }
+
+    // Buscar por nombre si no se encontró por folio
+    if (!existingRow && cleanNombre) {
+      const byNombre = await client.execute({
+        sql: 'SELECT id, nombre, folio, telefono, ip FROM clientes WHERE LOWER(nombre) = LOWER(?) LIMIT 1',
+        args: [cleanNombre],
+      });
+      if (byNombre.rows.length > 0) {
+        existingRow = byNombre.rows[0];
+      }
+    }
+
+    if (existingRow) {
+      // Actualizar cliente existente sin duplicarlo
+      await client.execute({
+        sql: `UPDATE clientes SET 
+                nombre = COALESCE(?, nombre),
+                folio = COALESCE(?, folio),
+                telefono = COALESCE(?, telefono),
+                ip = COALESCE(?, ip)
+              WHERE id = ?`,
+        args: [
+          cleanNombre || existingRow.nombre,
+          cleanFolio || existingRow.folio,
+          cleanTelefono || existingRow.telefono,
+          cleanIp || existingRow.ip,
+          existingRow.id,
+        ],
+      });
+    } else {
+      // Insertar nuevo cliente
+      await client.execute({
+        sql: `INSERT INTO clientes (folio, nombre, telefono, ip, fecha_registro, es_antena, activo) VALUES (?, ?, ?, ?, ?, 1, 1)`,
+        args: [
+          cleanFolio,
+          cleanNombre || 'Cliente sin nombre',
+          cleanTelefono,
+          cleanIp,
+          getLocalDateString(),
+        ],
+      });
+    }
+  } catch (err) {
+    console.error('Error en upsertClientFromReport:', err);
+  }
+}
+
 export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte> {
   const { semana, año } = getWeekAndYear(data.fecha_creacion);
   const reporteFinal: Reporte = {
@@ -403,19 +481,13 @@ export async function insertReporte(data: Omit<Reporte, 'id'>): Promise<Reporte>
         reporteFinal.año ?? año,
       ];
 
-      // Insertar o actualizar el cliente en la tabla clientes
-      if (reporteFinal.nombre_cliente) {
-        await client.execute({
-          sql: `INSERT OR IGNORE INTO clientes (folio, nombre, telefono, ip, fecha_registro, es_antena, activo) VALUES (?, ?, ?, ?, ?, 1, 1)`,
-          args: [
-            reporteFinal.folio ?? null, 
-            reporteFinal.nombre_cliente, 
-            reporteFinal.telefono_cliente ?? null, 
-            reporteFinal.ip_cliente ?? null, 
-            getLocalDateString()
-          ]
-        });
-      }
+      // Insertar o actualizar inteligencialmente el cliente en la tabla clientes sin duplicados
+      await upsertClientFromReport(
+        reporteFinal.nombre_cliente,
+        reporteFinal.folio,
+        reporteFinal.telefono_cliente,
+        reporteFinal.ip_cliente
+      );
 
       try {
         const res = await client.execute({ sql, args });
@@ -469,6 +541,17 @@ export async function updateReporte(id: number, data: Partial<Reporte>): Promise
       args.push(id);
       const sql = `UPDATE reportes SET ${setClauses.join(', ')} WHERE id = ?`;
       await client.execute({ sql, args });
+
+      // Si se actualizaron datos de cliente en el reporte, sincronizar cliente sin duplicar
+      if (data.nombre_cliente || data.folio || data.telefono_cliente || data.ip_cliente) {
+        await upsertClientFromReport(
+          data.nombre_cliente,
+          data.folio,
+          data.telefono_cliente,
+          data.ip_cliente
+        );
+      }
+
       return true;
     } catch (err) {
       console.error('Error actualizando en Turso DB:', err);

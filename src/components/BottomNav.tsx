@@ -5,7 +5,7 @@ import { NavTab } from './Header';
 import { UserSession } from '@/lib/auth';
 import {
   Home, LayoutList, Plus, Clock,
-  MoreHorizontal, History, Users,
+  MoreHorizontal, History, Users, Layers,
   Moon, Sun, Monitor, X,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';

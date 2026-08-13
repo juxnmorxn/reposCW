@@ -168,9 +168,9 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-modal overflow-hidden flex flex-col max-h-[90vh] my-auto animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-3xl shadow-modal overflow-hidden flex flex-col max-h-[92vh] my-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Encabezado Modal */}
-        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center font-bold">
               <Plus className="w-5 h-5" />
@@ -193,7 +193,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
         </div>
 
         {/* Cuerpo del Formulario */}
-        <form onSubmit={handleSubmitForm} className="p-5 overflow-y-auto space-y-5 flex-1">
+        <form onSubmit={handleSubmitForm} className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
           {/* Selector de Tipo de Actividad (Tab Pills) */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-2">
@@ -228,23 +228,56 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
           {/* Fila General: Fecha y Estado */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
-                Fecha de Registro
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200">
+                  Fecha de la Actividad / Registro
+                </label>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setFechaCreacion(todayStr)}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all ${
+                      fechaCreacion === todayStr
+                        ? 'bg-brand-600 text-white'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300'
+                    }`}
+                  >
+                    Hoy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const d = new Date();
+                      d.setDate(d.getDate() - 1);
+                      const y = d.getFullYear();
+                      const m = String(d.getMonth() + 1).padStart(2, '0');
+                      const day = String(d.getDate()).padStart(2, '0');
+                      setFechaCreacion(`${y}-${m}-${day}`);
+                    }}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all ${
+                      fechaCreacion !== todayStr
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300'
+                    }`}
+                  >
+                    Ayer
+                  </button>
+                </div>
+              </div>
               <input
                 type="date"
                 required
                 value={fechaCreacion}
                 onChange={(e) => setFechaCreacion(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Estado</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Estado del Reporte</label>
               <select
                 value={estado}
                 onChange={(e) => setEstado(e.target.value as EstadoReporte)}
-                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
               >
                 <option value="Pendiente">⏳ Pendiente</option>
                 <option value="En Proceso">🔄 En Proceso</option>
@@ -256,7 +289,7 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
           {/* CAMPOS DINÁMICOS SEGÚN TIPO DE ACTIVIDAD */}
           {tipoActividad === 'soporte' && (
-            <div className="space-y-4 bg-slate-50 dark:bg-slate-900/50/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <div className="space-y-4 bg-slate-50 dark:bg-slate-900/50/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700">
               <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
                 <Wrench className="w-4 h-4" /> Datos del Cliente y Soporte Técnico
               </h3>
@@ -359,11 +392,11 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
               <div>
                 <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Acción Realizada</label>
                 <textarea
-                  rows={2}
-                  placeholder="Pasos técnicos ejecutados para resolver el problema..."
+                  rows={6}
+                  placeholder="Redacta en detalle los pasos técnicos ejecutados para resolver el problema (estilo correo electrónico)..."
                   value={accionRealizada}
                   onChange={(e) => setAccionRealizada(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 min-h-[140px] resize-y shadow-inner"
                 />
               </div>
 
@@ -381,19 +414,19 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
           )}
 
           {tipoActividad === 'libre' && (
-            <div className="space-y-4 bg-slate-50 dark:bg-slate-900/50/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <div className="space-y-4 bg-slate-50 dark:bg-slate-900/50/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700">
               <h3 className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4" /> Descripción de Actividad Libre
               </h3>
               <div>
                 <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Detalle de Actividad</label>
                 <textarea
-                  rows={4}
+                  rows={6}
                   required
-                  placeholder="Describe tus actividades del día (trabajo en campo, mantenimiento general, instalaciones, etc.)..."
+                  placeholder="Describe en detalle tus actividades del día (trabajo en campo, mantenimiento general, instalaciones, etc.)..."
                   value={descripcionActividad}
                   onChange={(e) => setDescripcionActividad(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 min-h-[140px] resize-y shadow-inner"
                 />
               </div>
             </div>
