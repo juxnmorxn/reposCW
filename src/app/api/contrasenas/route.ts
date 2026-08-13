@@ -19,8 +19,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    if (!body.grupo_id || !body.titulo || !body.usuario || !body.contrasena) {
-      return NextResponse.json({ error: 'Campos obligatorios requeridos (grupo_id, titulo, usuario, contrasena)' }, { status: 400 });
+    if (!body.grupo_id || !body.titulo) {
+      return NextResponse.json({ error: 'Campos obligatorios requeridos (grupo_id, titulo)' }, { status: 400 });
     }
 
     const nuevaContrasena = await insertContrasena(body);

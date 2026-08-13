@@ -783,13 +783,19 @@ export async function ensurePasswordTablesExist(): Promise<void> {
       CREATE TABLE IF NOT EXISTS contrasenas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         grupo_id INTEGER NOT NULL,
+        tipo_registro TEXT DEFAULT 'contrasena',
         titulo TEXT NOT NULL,
-        usuario TEXT NOT NULL,
-        contrasena TEXT NOT NULL,
+        usuario TEXT,
+        contrasena TEXT,
+        tipo_nota TEXT DEFAULT 'abierta',
+        contenido TEXT,
         descripcion TEXT,
         fecha_creacion DATE
       );
     `);
+    try { await client.execute(`ALTER TABLE contrasenas ADD COLUMN tipo_registro TEXT DEFAULT 'contrasena'`); } catch {}
+    try { await client.execute(`ALTER TABLE contrasenas ADD COLUMN tipo_nota TEXT DEFAULT 'abierta'`); } catch {}
+    try { await client.execute(`ALTER TABLE contrasenas ADD COLUMN contenido TEXT`); } catch {}
   } catch (err) {
     console.error('Error asegurando tablas de contraseñas:', err);
   }
@@ -878,9 +884,12 @@ export async function fetchContrasenas(grupo_id?: number): Promise<Contrasena[]>
     return res.rows.map(r => ({
       id: Number(r.id),
       grupo_id: Number(r.grupo_id),
+      tipo_registro: (r.tipo_registro as any) || 'contrasena',
       titulo: String(r.titulo),
-      usuario: String(r.usuario),
-      contrasena: String(r.contrasena),
+      usuario: r.usuario ? String(r.usuario) : '',
+      contrasena: r.contrasena ? String(r.contrasena) : '',
+      tipo_nota: (r.tipo_nota as any) || 'abierta',
+      contenido: r.contenido ? String(r.contenido) : undefined,
       descripcion: r.descripcion ? String(r.descripcion) : undefined,
       fecha_creacion: r.fecha_creacion ? String(r.fecha_creacion) : undefined
     }));
@@ -897,9 +906,19 @@ export async function insertContrasena(data: Omit<Contrasena, 'id'>): Promise<Co
     await ensurePasswordTablesExist();
     const fecha = getLocalDateString();
     const res = await client.execute({
-      sql: `INSERT INTO contrasenas (grupo_id, titulo, usuario, contrasena, descripcion, fecha_creacion) 
-            VALUES (?, ?, ?, ?, ?, ?)`,
-      args: [data.grupo_id, data.titulo, data.usuario, data.contrasena, data.descripcion || null, fecha]
+      sql: `INSERT INTO contrasenas (grupo_id, tipo_registro, titulo, usuario, contrasena, tipo_nota, contenido, descripcion, fecha_creacion) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        data.grupo_id,
+        data.tipo_registro || 'contrasena',
+        data.titulo,
+        data.usuario || '',
+        data.contrasena || '',
+        data.tipo_nota || 'abierta',
+        data.contenido || null,
+        data.descripcion || null,
+        fecha
+      ]
     });
     return { ...data, id: Number(res.lastInsertRowid), fecha_creacion: fecha };
   } catch (err) {
@@ -912,12 +931,16 @@ export async function updateContrasena(id: number, data: Partial<Contrasena>): P
   const client = getDbClient();
   if (!client) return false;
   try {
+    await ensurePasswordTablesExist();
     const fields = [];
     const args = [];
     if (data.grupo_id !== undefined) { fields.push('grupo_id = ?'); args.push(data.grupo_id); }
+    if (data.tipo_registro !== undefined) { fields.push('tipo_registro = ?'); args.push(data.tipo_registro); }
     if (data.titulo !== undefined) { fields.push('titulo = ?'); args.push(data.titulo); }
     if (data.usuario !== undefined) { fields.push('usuario = ?'); args.push(data.usuario); }
     if (data.contrasena !== undefined) { fields.push('contrasena = ?'); args.push(data.contrasena); }
+    if (data.tipo_nota !== undefined) { fields.push('tipo_nota = ?'); args.push(data.tipo_nota); }
+    if (data.contenido !== undefined) { fields.push('contenido = ?'); args.push(data.contenido); }
     if (data.descripcion !== undefined) { fields.push('descripcion = ?'); args.push(data.descripcion); }
     
     if (fields.length === 0) return true;
@@ -936,6 +959,7 @@ export async function deleteContrasena(id: number): Promise<boolean> {
   const client = getDbClient();
   if (!client) return false;
   try {
+    await ensurePasswordTablesExist();
     await client.execute({ sql: 'DELETE FROM contrasenas WHERE id = ?', args: [id] });
     return true;
   } catch (err) {

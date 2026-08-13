@@ -69,6 +69,15 @@ export interface Cliente {
   fecha_registro?: string;
 }
 
+export type TipoRegistro = 'contrasena' | 'nota';
+export type TipoNota = 'abierta' | 'lista';
+
+export interface ChecklistItem {
+  id: string;
+  texto: string;
+  completado: boolean;
+}
+
 export interface GrupoContrasena {
   id?: number;
   nombre: string;
@@ -78,9 +87,12 @@ export interface GrupoContrasena {
 export interface Contrasena {
   id?: number;
   grupo_id: number;
+  tipo_registro?: TipoRegistro;
   titulo: string;
-  usuario: string;
-  contrasena: string;
+  usuario?: string;
+  contrasena?: string;
+  tipo_nota?: TipoNota;
+  contenido?: string;
   descripcion?: string;
   fecha_creacion?: string;
 }
