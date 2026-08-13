@@ -105,7 +105,7 @@ function DashboardContent() {
         busqueda
       )}`;
 
-      if (activeTab === 'historial' || activeTab === 'gestion' || modoFecha === 'todos') {
+      if (activeTab === 'historial' || modoFecha === 'todos') {
         queryUrl += `&año=${año}`;
       } else if (modoFecha === 'diario') {
         queryUrl += `&fechaExacta=${todayStr}`;
@@ -248,7 +248,7 @@ function DashboardContent() {
         </div>
 
         {/* Filtro de Fecha Rápido para Móvil */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <select
             value={modoFecha}
             onChange={(e) => setModoFecha(e.target.value as any)}
@@ -259,6 +259,15 @@ function DashboardContent() {
             <option value="mes">🗓️ Mes</option>
             <option value="todos">♾️ Todos</option>
           </select>
+
+          {modoFecha === 'fecha' && (
+            <input
+              type="date"
+              value={fechaExacta}
+              onChange={(e) => setFechaExacta(e.target.value)}
+              className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-[11px] font-bold rounded-xl px-2 py-1 focus:outline-none shadow-sm"
+            />
+          )}
         </div>
       </div>
 
