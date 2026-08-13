@@ -290,7 +290,14 @@ function DashboardContent() {
                 </div>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEstadoFiltro('todos');
+                    handleTabChange('gestion');
+                  }}
+                  className="text-left bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none hover:border-brand-500 transition-all flex items-center justify-between active:scale-95"
+                >
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Actividades</p>
                     <h4 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-1">{total}</h4>
@@ -298,9 +305,16 @@ function DashboardContent() {
                   <div className="w-11 h-11 rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 flex items-center justify-center shrink-0">
                     <BarChart3 className="w-6 h-6" />
                   </div>
-                </div>
+                </button>
 
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEstadoFiltro('Completado');
+                    handleTabChange('gestion');
+                  }}
+                  className="text-left bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none hover:border-emerald-500 transition-all flex items-center justify-between active:scale-95"
+                >
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Completados</p>
                     <h4 className="text-xl sm:text-2xl font-extrabold text-emerald-600 mt-1">{completados}</h4>
@@ -308,9 +322,16 @@ function DashboardContent() {
                   <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
-                </div>
+                </button>
 
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEstadoFiltro('Pendiente');
+                    handleTabChange('gestion');
+                  }}
+                  className="text-left bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none hover:border-amber-500 transition-all flex items-center justify-between active:scale-95"
+                >
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Pendientes</p>
                     <h4 className="text-xl sm:text-2xl font-extrabold text-amber-600 mt-1">{pendientes}</h4>
@@ -318,9 +339,16 @@ function DashboardContent() {
                   <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center shrink-0">
                     <Clock className="w-6 h-6" />
                   </div>
-                </div>
+                </button>
 
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEstadoFiltro('No Completado');
+                    handleTabChange('gestion');
+                  }}
+                  className="text-left bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-card dark:shadow-none hover:border-rose-500 transition-all flex items-center justify-between active:scale-95"
+                >
                   <div>
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">No Completados</p>
                     <h4 className="text-xl sm:text-2xl font-extrabold text-rose-600 mt-1">{noCompletados}</h4>
@@ -328,7 +356,7 @@ function DashboardContent() {
                   <div className="w-11 h-11 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center shrink-0">
                     <XCircle className="w-6 h-6" />
                   </div>
-                </div>
+                </button>
               </div>
             </div>
 

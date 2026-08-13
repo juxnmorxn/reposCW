@@ -78,6 +78,14 @@ export const ReportCard: React.FC<ReportCardProps> = ({
     reporte.accion_realizada ||
     '';
 
+  const numFotos = Array.isArray(reporte.evidencia_urls) ? reporte.evidencia_urls.length : 0;
+
+  const handleCopyText = (e: React.MouseEvent, text?: string) => {
+    e.stopPropagation();
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+  };
+
   return (
     <div
       className="group relative bg-white dark:bg-[#1a1d27] rounded-2xl border border-slate-200 dark:border-[#2d3147] p-4 shadow-sm hover:shadow-md dark:hover:shadow-none dark:hover:border-[#3a3f5c] transition-all cursor-pointer"
@@ -91,22 +99,49 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           </div>
 
           <div className="min-w-0">
-            {/* Type badge */}
-            <span className="inline-flex items-center text-[10px] font-extrabold uppercase tracking-wider text-brand-500 bg-brand-500/10 px-2 py-0.5 rounded-md mb-1">
-              {reporte.tipo_actividad}
-            </span>
+            {/* Type badge & Evidencias badge */}
+            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+              <span className="inline-flex items-center text-[10px] font-extrabold uppercase tracking-wider text-brand-500 bg-brand-500/10 px-2 py-0.5 rounded-md">
+                {reporte.tipo_actividad}
+              </span>
+              {numFotos > 0 && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                  📷 {numFotos} foto{numFotos > 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
 
             {/* Title */}
             <h3 className="font-bold text-slate-900 dark:text-white text-sm leading-tight truncate">
               {title}
             </h3>
 
-            {/* Folio */}
-            {reporte.folio && (
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Folio: {reporte.folio}
-              </p>
-            )}
+            {/* Folio, IP y Teléfono con 1-clic copy */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              {reporte.folio && <span>Folio: {reporte.folio}</span>}
+              {reporte.ip_cliente && (
+                <button
+                  type="button"
+                  onClick={(e) => handleCopyText(e, reporte.ip_cliente)}
+                  className="font-mono text-brand-600 font-semibold hover:underline flex items-center gap-0.5"
+                  title="Clic para copiar IP"
+                >
+                  <span>{reporte.ip_cliente}</span>
+                  <span className="text-[9px] opacity-70">📋</span>
+                </button>
+              )}
+              {reporte.telefono_cliente && (
+                <button
+                  type="button"
+                  onClick={(e) => handleCopyText(e, reporte.telefono_cliente)}
+                  className="hover:text-brand-600 flex items-center gap-0.5"
+                  title="Clic para copiar Teléfono"
+                >
+                  <span>📞 {reporte.telefono_cliente}</span>
+                  <span className="text-[9px] opacity-70">📋</span>
+                </button>
+              )}
+            </div>
 
             {/* Subtitle */}
             {subtitle && (
@@ -128,11 +163,11 @@ export const ReportCard: React.FC<ReportCardProps> = ({
           <span>{reporte.fecha_creacion}</span>
         </div>
 
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
           {onEdit && (
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(reporte); }}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-brand-500 hover:bg-brand-500/10 transition-colors"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-brand-500 hover:bg-brand-500/10 transition-colors"
               title="Editar"
             >
               <Edit2 className="w-4 h-4" />

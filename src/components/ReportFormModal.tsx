@@ -100,6 +100,12 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
     setEvidenciaUrls([]);
   };
 
+  const handleAutoGrow = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    target.style.height = 'auto';
+    target.style.height = `${Math.max(140, target.scrollHeight)}px`;
+  };
+
   if (!isOpen) return null;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -359,11 +365,12 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
               <div>
                 <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Acción Realizada</label>
                 <textarea
-                  rows={6}
+                  rows={5}
                   placeholder="Redacta en detalle los pasos técnicos ejecutados para resolver el problema (estilo correo electrónico)..."
                   value={accionRealizada}
+                  onInput={handleAutoGrow}
                   onChange={(e) => setAccionRealizada(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 min-h-[140px] resize-y shadow-inner"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 min-h-[140px] overflow-hidden resize-none shadow-inner"
                 />
               </div>
 
@@ -388,12 +395,13 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
               <div>
                 <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Detalle de Actividad</label>
                 <textarea
-                  rows={6}
+                  rows={5}
                   required
                   placeholder="Describe en detalle tus actividades del día (trabajo en campo, mantenimiento general, instalaciones, etc.)..."
                   value={descripcionActividad}
+                  onInput={handleAutoGrow}
                   onChange={(e) => setDescripcionActividad(e.target.value)}
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 min-h-[140px] resize-y shadow-inner"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 min-h-[140px] overflow-hidden resize-none shadow-inner"
                 />
               </div>
             </div>
