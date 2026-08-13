@@ -106,30 +106,6 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
     target.style.height = `${Math.max(140, target.scrollHeight)}px`;
   };
 
-  const handleIpChange = async (newIp: string) => {
-    setIpCliente(newIp);
-    const clean = newIp.trim();
-    if (clean.length >= 3) {
-      try {
-        const res = await fetch(`/api/clientes/search?q=${encodeURIComponent(clean)}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (json.results && json.results.length > 0) {
-            const match = json.results.find((c: any) => c.ip && c.ip.toLowerCase().includes(clean.toLowerCase())) || json.results[0];
-            if (match) {
-              if (match.nombre) setNombreCliente(`${match.nombre} ${match.direccion ? `- ${match.direccion}` : ''}`.trim());
-              if (match.folio) setFolio(match.folio);
-              if (match.telefono) setTelefonoCliente(match.telefono);
-              if (match.ip) setIpCliente(match.ip);
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Error autocompletando por IP:', err);
-      }
-    }
-  };
-
   if (!isOpen) return null;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -331,13 +307,19 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Dirección IP (Búsqueda automática)</label>
-                  <input
-                    type="text"
+                  <ClientAutocomplete
+                    label="Dirección IP del Cliente"
                     placeholder="Ej. 172.17.8.63 (Buscar por IP)..."
                     value={ipCliente}
-                    onChange={(e) => handleIpChange(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-brand-600 dark:text-brand-400 focus:ring-2 focus:ring-brand-500"
+                    onChange={(val) => setIpCliente(val)}
+                    displayFormat="ip"
+                    autoSelectExactIp={true}
+                    onSelectClient={(c) => {
+                      if (c.ip) setIpCliente(c.ip);
+                      if (c.nombre) setNombreCliente(`${c.nombre} ${c.direccion ? `- ${c.direccion}` : ''}`.trim());
+                      if (c.folio) setFolio(c.folio);
+                      if (c.telefono) setTelefonoCliente(c.telefono);
+                    }}
                   />
                 </div>
               </div>

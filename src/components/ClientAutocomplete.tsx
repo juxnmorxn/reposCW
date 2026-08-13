@@ -10,6 +10,9 @@ interface ClientAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
   onSelectClient: (cliente: Cliente) => void;
+  displayFormat?: 'name' | 'ip';
+  inputClassName?: string;
+  autoSelectExactIp?: boolean;
 }
 
 export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
@@ -18,6 +21,9 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
   value,
   onChange,
   onSelectClient,
+  displayFormat = 'name',
+  inputClassName = 'w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500',
+  autoSelectExactIp = false,
 }) => {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<Cliente[]>([]);
@@ -40,7 +46,8 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
   }, []);
 
   useEffect(() => {
-    if (query.trim().length < 2) {
+    const clean = query.trim();
+    if (clean.length < 2) {
       setResults([]);
       setShowDropdown(false);
       return;
@@ -49,26 +56,39 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
     const delayDebounceFn = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/clientes/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`/api/clientes/search?q=${encodeURIComponent(clean)}`);
         if (res.ok) {
           const data = await res.json();
-          setResults(data.results || []);
-          setShowDropdown(data.results && data.results.length > 0);
+          const list: Cliente[] = data.results || [];
+          setResults(list);
+          setShowDropdown(list.length > 0);
+
+          // Si autoSelectExactIp está activo y se escribió una IP exacta completa (ej. 172.17.8.63)
+          if (autoSelectExactIp && clean.length >= 7) {
+            const exactMatch = list.find(
+              (c) => c.ip && c.ip.trim().toLowerCase() === clean.toLowerCase()
+            );
+            if (exactMatch) {
+              onSelectClient(exactMatch);
+              setShowDropdown(false);
+            }
+          }
         }
       } catch (err) {
         console.error('Error searching clients:', err);
       } finally {
         setIsLoading(false);
       }
-    }, 400);
+    }, 350);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query]);
+  }, [query, autoSelectExactIp]);
 
   const handleSelect = (c: Cliente) => {
     onSelectClient(c);
-    setQuery(c.nombre);
-    onChange(c.nombre);
+    const displayVal = displayFormat === 'ip' ? (c.ip || query) : `${c.nombre} ${c.direccion ? `- ${c.direccion}` : ''}`.trim();
+    setQuery(displayVal);
+    onChange(displayVal);
     setShowDropdown(false);
   };
 
@@ -88,7 +108,7 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
           onFocus={() => {
             if (results.length > 0) setShowDropdown(true);
           }}
-          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500"
+          className={inputClassName}
         />
         {isLoading && (
           <Loader2 className="w-4 h-4 animate-spin text-brand-600 absolute right-3 top-2.5" />
@@ -101,13 +121,24 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
             <li
               key={c.id}
               onClick={() => handleSelect(c)}
-              className="px-3 py-2 hover:bg-slate-50 dark:bg-slate-900/50 cursor-pointer flex flex-col"
+              className="px-3.5 py-2.5 hover:bg-brand-50/60 dark:hover:bg-slate-800 cursor-pointer flex flex-col transition-colors"
             >
-              <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{c.nombre} {c.folio ? `(${c.folio})` : ''}</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                {c.ip && <span className="text-brand-600 font-semibold">{c.ip}</span>}
-                {c.direccion && <span>• {c.direccion}</span>}
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">
+                  {c.nombre} {c.folio ? `(${c.folio})` : ''}
+                </span>
+                {c.ip && (
+                  <span className="text-[11px] font-mono font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/40 px-2 py-0.5 rounded-md border border-brand-200 dark:border-brand-800 shrink-0">
+                    IP: {c.ip}
+                  </span>
+                )}
+              </div>
+              {(c.direccion || c.telefono) && (
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {c.telefono && <span>📞 {c.telefono} </span>}
+                  {c.direccion && <span>• 📍 {c.direccion}</span>}
+                </span>
+              )}
             </li>
           ))}
         </ul>
