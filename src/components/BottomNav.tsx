@@ -33,7 +33,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     setIsMoreOpen(false);
   };
 
-  const isMoreActive = ['historial', 'clientes'].includes(activeTab);
+  const isMoreActive = ['recordatorios', 'clientes', 'contrasenas'].includes(activeTab);
 
   const NavButton = ({ id, label, icon: Icon, badge }: { id: NavTab; label: string; icon: React.ElementType; badge?: number }) => {
     const isActive = activeTab === id;
@@ -79,8 +79,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             </button>
           </div>
 
-          {/* ── Right: Seguimiento ── */}
-          <NavButton id="recordatorios" label="Seguimiento" icon={Clock} badge={pendingFollowUpsCount} />
+          {/* ── Right: Historial ── */}
+          <NavButton id="historial" label="Historial" icon={History} />
 
           {/* ── Right: Más ── */}
           <button
@@ -120,23 +120,23 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             </div>
 
             <div className="px-5 space-y-2 pb-3">
-              {/* Historial */}
+              {/* Seguimiento */}
               <button
-                onClick={() => handleTab('historial')}
+                onClick={() => handleTab('recordatorios')}
                 className={`w-full flex items-center gap-3 p-3.5 rounded-2xl font-bold transition-all ${
-                  activeTab === 'historial'
+                  activeTab === 'recordatorios'
                     ? 'bg-slate-900 text-white dark:bg-[#ccff00]/12 dark:border dark:border-[#ccff00]/25 dark:text-[#ccff00]'
                     : 'bg-slate-50 border border-slate-100 text-slate-700 dark:bg-white/5 dark:border-white/5 dark:text-white/70 active:bg-slate-100 dark:active:bg-white/10'
                 }`}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  activeTab === 'historial' ? 'bg-slate-800 dark:bg-[#ccff00] text-white dark:text-[#0f1117]' : 'bg-slate-200 dark:bg-white/8'
+                  activeTab === 'recordatorios' ? 'bg-slate-800 dark:bg-[#ccff00] text-white dark:text-[#0f1117]' : 'bg-slate-200 dark:bg-white/8'
                 }`}>
-                  <History className="w-5 h-5" />
+                  <Clock className="w-5 h-5" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold">Historial de Reportes</p>
-                  <p className={`text-[11px] font-normal ${activeTab === 'historial' ? 'text-slate-300 dark:text-white/40' : 'text-slate-500 dark:text-white/40'}`}>Exportación y registros pasados</p>
+                  <p className="text-sm font-bold">Seguimiento de Calidad</p>
+                  <p className={`text-[11px] font-normal ${activeTab === 'recordatorios' ? 'text-slate-300 dark:text-white/40' : 'text-slate-500 dark:text-white/40'}`}>Verificación post-soporte</p>
                 </div>
               </button>
 
