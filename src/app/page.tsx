@@ -259,13 +259,6 @@ function DashboardContent() {
             <option value="mes">🗓️ Mes</option>
             <option value="todos">♾️ Todos</option>
           </select>
-
-          {isTursoLive && (
-            <span className="hidden xs:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live
-            </span>
-          )}
         </div>
       </div>
 

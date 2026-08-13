@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchGruposContrasenas, insertGrupoContrasena, updateGrupoContrasena, deleteGrupoContrasena } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const data = await fetchGruposContrasenas();

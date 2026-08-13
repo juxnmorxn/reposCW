@@ -766,10 +766,38 @@ export async function validateUserInDb(
 // OPERACIONES DE GESTIÓN DE CONTRASEÑAS (TURSO)
 // -------------------------------------------------------------
 
+export async function ensurePasswordTablesExist(): Promise<void> {
+  const client = getDbClient();
+  if (!client) return;
+  try {
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS grupos_contrasenas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        fecha_creacion DATE
+      );
+    `);
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS contrasenas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        grupo_id INTEGER NOT NULL,
+        titulo TEXT NOT NULL,
+        usuario TEXT NOT NULL,
+        contrasena TEXT NOT NULL,
+        descripcion TEXT,
+        fecha_creacion DATE
+      );
+    `);
+  } catch (err) {
+    console.error('Error asegurando tablas de contraseñas:', err);
+  }
+}
+
 export async function fetchGruposContrasenas(): Promise<GrupoContrasena[]> {
   const client = getDbClient();
   if (!client) return [];
   try {
+    await ensurePasswordTablesExist();
     const res = await client.execute('SELECT * FROM grupos_contrasenas ORDER BY nombre ASC');
     return res.rows.map(r => ({
       id: Number(r.id),
@@ -786,6 +814,7 @@ export async function insertGrupoContrasena(nombre: string): Promise<GrupoContra
   const client = getDbClient();
   if (!client) return null;
   try {
+    await ensurePasswordTablesExist();
     const fecha = getLocalDateString();
     const res = await client.execute({
       sql: 'INSERT INTO grupos_contrasenas (nombre, fecha_creacion) VALUES (?, ?)',
@@ -802,6 +831,7 @@ export async function updateGrupoContrasena(id: number, nombre: string): Promise
   const client = getDbClient();
   if (!client) return false;
   try {
+    await ensurePasswordTablesExist();
     await client.execute({
       sql: 'UPDATE grupos_contrasenas SET nombre = ? WHERE id = ?',
       args: [nombre, id]
@@ -817,6 +847,7 @@ export async function deleteGrupoContrasena(id: number): Promise<boolean> {
   const client = getDbClient();
   if (!client) return false;
   try {
+    await ensurePasswordTablesExist();
     await client.execute({
       sql: 'DELETE FROM grupos_contrasenas WHERE id = ?',
       args: [id]
@@ -832,6 +863,7 @@ export async function fetchContrasenas(grupo_id?: number): Promise<Contrasena[]>
   const client = getDbClient();
   if (!client) return [];
   try {
+    await ensurePasswordTablesExist();
     let sql = 'SELECT * FROM contrasenas';
     const args: any[] = [];
     if (grupo_id) {
@@ -860,6 +892,7 @@ export async function insertContrasena(data: Omit<Contrasena, 'id'>): Promise<Co
   const client = getDbClient();
   if (!client) return null;
   try {
+    await ensurePasswordTablesExist();
     const fecha = getLocalDateString();
     const res = await client.execute({
       sql: `INSERT INTO contrasenas (grupo_id, titulo, usuario, contrasena, descripcion, fecha_creacion) 

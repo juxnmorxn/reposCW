@@ -98,27 +98,14 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="hidden md:block sticky top-0 z-30 header-glass">
       <div className="max-w-7xl mx-auto px-4 py-2.5 sm:px-6 flex items-center justify-between gap-3">
-        {/* IZQUIERDA: Isotipo vector ISP + Nombre Repos ISP + Insignia Turso DB */}
+        {/* IZQUIERDA: Isotipo vector ISP + Nombre Repos ISP */}
         <div className="flex items-center gap-2.5 shrink-0">
           <ISPLogo size={36} />
           <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg tracking-tight leading-none">
-                Repos ISP
-              </h1>
-              {isTursoLive ? (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Turso Live
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  <Database className="w-3 h-3" />
-                  Turso DB
-                </span>
-              )}
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Soporte Técnico & Redes</p>
+            <h1 className="font-extrabold text-slate-900 dark:text-white text-base sm:text-lg tracking-tight leading-none">
+              Repos ISP
+            </h1>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Soporte Técnico & Redes</p>
           </div>
         </div>
 
@@ -366,11 +353,24 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-modal p-3 z-50 space-y-2 animate-in fade-in zoom-in-95 duration-150">
                 {userSession ? (
                   <>
-                    <div className="px-2 py-1">
-                      <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-tight">
-                        {userSession.nombre}
-                      </p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{userSession.rol}</p>
+                    <div className="px-2 py-1 flex items-center justify-between gap-2">
+                      <div>
+                        <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-tight">
+                          {userSession.nombre}
+                        </p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{userSession.rol}</p>
+                      </div>
+                      {isTursoLive ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Turso
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          <Database className="w-2.5 h-2.5" />
+                          Local
+                        </span>
+                      )}
                     </div>
 
                     {/* Selector de Tema */}
