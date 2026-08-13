@@ -228,42 +228,9 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
           {/* Fila General: Fecha y Estado */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200">
-                  Fecha de la Actividad / Registro
-                </label>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setFechaCreacion(todayStr)}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all ${
-                      fechaCreacion === todayStr
-                        ? 'bg-brand-600 text-white'
-                        : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300'
-                    }`}
-                  >
-                    Hoy
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const d = new Date();
-                      d.setDate(d.getDate() - 1);
-                      const y = d.getFullYear();
-                      const m = String(d.getMonth() + 1).padStart(2, '0');
-                      const day = String(d.getDate()).padStart(2, '0');
-                      setFechaCreacion(`${y}-${m}-${day}`);
-                    }}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all ${
-                      fechaCreacion !== todayStr
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300'
-                    }`}
-                  >
-                    Ayer
-                  </button>
-                </div>
-              </div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
+                Fecha de Registro / Actividad
+              </label>
               <input
                 type="date"
                 required
@@ -483,8 +450,8 @@ export const ReportFormModal: React.FC<ReportFormModalProps> = ({
 
 
 
-          {/* Botones de acción */}
-          <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3">
+          {/* Botones de acción fijos abajo */}
+          <div className="p-4 sm:px-6 bg-slate-50 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3 shrink-0 z-10">
             <button
               type="button"
               onClick={onClose}

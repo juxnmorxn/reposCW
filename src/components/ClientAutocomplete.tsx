@@ -96,7 +96,7 @@ export const ClientAutocomplete: React.FC<ClientAutocompleteProps> = ({
       </div>
 
       {showDropdown && results.length > 0 && (
-        <ul className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-100">
+        <ul className="absolute z-50 left-0 right-0 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl max-h-44 sm:max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
           {results.map((c) => (
             <li
               key={c.id}

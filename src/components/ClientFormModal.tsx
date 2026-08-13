@@ -225,8 +225,8 @@ export const ClientFormModal: React.FC<ClientFormModalProps> = ({
             </div>
           </div>
 
-          {/* Botones de acción */}
-          <div className="pt-4 mt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3">
+          {/* Botones de acción fijos abajo */}
+          <div className="p-4 sm:px-6 bg-slate-50 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-3 shrink-0 z-10">
             <button
               type="button"
               onClick={onClose}

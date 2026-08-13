@@ -234,9 +234,9 @@ function DashboardContent() {
       />
 
       {/* MOBILE MINI TOPBAR (visible only on mobile) */}
-      <div className="md:hidden sticky top-0 z-30 header-glass px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden sticky top-0 z-30 header-glass px-4 py-2.5 flex items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center shrink-0 shadow-sm">
             <span className="text-white text-xs font-extrabold">ISP</span>
           </div>
           <div>
@@ -246,12 +246,27 @@ function DashboardContent() {
             )}
           </div>
         </div>
-        {isTursoLive && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Live
-          </span>
-        )}
+
+        {/* Filtro de Fecha Rápido para Móvil */}
+        <div className="flex items-center gap-2">
+          <select
+            value={modoFecha}
+            onChange={(e) => setModoFecha(e.target.value as any)}
+            className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-[11px] font-bold rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
+          >
+            <option value="diario">📅 Hoy</option>
+            <option value="fecha">📆 Fecha</option>
+            <option value="mes">🗓️ Mes</option>
+            <option value="todos">♾️ Todos</option>
+          </select>
+
+          {isTursoLive && (
+            <span className="hidden xs:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live
+            </span>
+          )}
+        </div>
       </div>
 
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-5 space-y-6 flex-1">
@@ -690,8 +705,85 @@ function DashboardContent() {
                           </div>
                         </div>
 
-                        {/* Tabla de Actividades de la Semana */}
-                        <div className="overflow-x-auto">
+                        {/* VISTA MÓVIL (< 640px): Tarjetas Apiladas Compactas */}
+                        <div className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                          {listaSemana.map((reporte) => {
+                            const isSoporte = reporte.tipo_actividad === 'soporte';
+                            return (
+                              <div key={reporte.id} className="p-3.5 space-y-2 hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase ${
+                                        isSoporte
+                                          ? 'bg-brand-500/10 text-brand-600 border border-brand-500/20'
+                                          : 'bg-indigo-500/10 text-indigo-600 border border-indigo-500/20'
+                                      }`}
+                                    >
+                                      {isSoporte ? 'Soporte' : 'Libre'}
+                                    </span>
+                                    <span className="text-[11px] font-medium text-slate-500">{reporte.fecha_creacion}</span>
+                                  </div>
+                                  <span
+                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                      reporte.estado === 'Completado' || reporte.estado === 'Resuelto'
+                                        ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                                        : reporte.estado === 'En Proceso'
+                                        ? 'bg-blue-500/10 text-blue-600 border border-blue-500/20'
+                                        : reporte.estado === 'Pendiente'
+                                        ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                                        : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+                                    }`}
+                                  >
+                                    {reporte.estado}
+                                  </span>
+                                </div>
+
+                                <div>
+                                  <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
+                                    {isSoporte ? reporte.nombre_cliente || 'Sin cliente' : 'Actividad General'}
+                                  </p>
+                                  {isSoporte && (reporte.ip_cliente || reporte.telefono_cliente) && (
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                      {reporte.ip_cliente && <span className="font-mono text-brand-600 font-semibold">{reporte.ip_cliente} </span>}
+                                      {reporte.telefono_cliente && <span>• {reporte.telefono_cliente}</span>}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed bg-slate-50 dark:bg-slate-800/40 p-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                                  {reporte.accion_realizada || reporte.descripcion_actividad || 'Sin detalles'}
+                                </p>
+
+                                <div className="flex items-center justify-end gap-2 pt-1">
+                                  <button
+                                    onClick={() => {
+                                      setPreviewReporte(reporte);
+                                      setIsPreviewOpen(true);
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold"
+                                  >
+                                    <FileText className="w-3.5 h-3.5" />
+                                    <span>Ver</span>
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setEditingReporte(reporte);
+                                      setIsModalOpen(true);
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 text-xs font-semibold"
+                                  >
+                                    <Wrench className="w-3.5 h-3.5" />
+                                    <span>Editar</span>
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* VISTA ESCRITORIO / TABLET (>= 640px): Tabla Completa */}
+                        <div className="hidden sm:block overflow-x-auto">
                           <table className="w-full text-left border-collapse">
                             <thead>
                               <tr className="bg-slate-100/70 dark:bg-slate-800/30 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
