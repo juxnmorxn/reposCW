@@ -235,5 +235,32 @@ export function generateWeeklyReportPDF(
     });
   }
 
-  doc.save(`Repos_Reporte_Actividades_${new Date().toISOString().split('T')[0]}.pdf`);
+  // Obtener nombre del mes en español
+  let mesNombre = '';
+  if (reportes.length > 0 && reportes[0].fecha_creacion) {
+    const parts = reportes[0].fecha_creacion.split('-');
+    if (parts.length === 3) {
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const meses = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+      ];
+      if (monthIdx >= 0 && monthIdx < 12) {
+        mesNombre = meses[monthIdx];
+      }
+    }
+  }
+
+  if (!mesNombre) {
+    const meses = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    mesNombre = meses[new Date().getMonth()];
+  }
+
+  const fechaHoy = new Date().toISOString().split('T')[0];
+  const nombreArchivo = `Repos_Reporte_Mes-${mesNombre}_Semana-${semana}_${año}_${fechaHoy}.pdf`;
+
+  doc.save(nombreArchivo);
 }
