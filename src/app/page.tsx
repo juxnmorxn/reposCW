@@ -502,24 +502,18 @@ function DashboardContent() {
                     onChange={(e) => setTipoFiltro(e.target.value)}
                     className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 cursor-pointer shadow-subtle"
                   >
-                    <option value="todos">Todas las Categorías</option>
+                    <option value="todos">Todas las Actividades</option>
                     <option value="soporte">Soporte Técnico</option>
-                    <option value="configuracion">Configuración</option>
-                    <option value="seguimiento">Seguimiento</option>
-                    <option value="administrativo">Administrativo</option>
-                    <option value="otros">Otros</option>
+                    <option value="libre">Actividades Libres</option>
                   </select>
                 </div>
 
                 <div className="hidden md:flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar bg-slate-50 dark:bg-slate-800/40 p-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider pl-1 shrink-0">Categoría:</span>
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider pl-1 shrink-0">Tipo:</span>
                   {[
                     { id: 'todos', label: 'Todas', icon: Layers },
-                    { id: 'soporte', label: 'Soporte', icon: Wrench },
-                    { id: 'configuracion', label: 'Configuración', icon: Settings },
-                    { id: 'seguimiento', label: 'Seguimiento', icon: PhoneCall },
-                    { id: 'administrativo', label: 'Administrativo', icon: FileText },
-                    { id: 'otros', label: 'Otros', icon: HelpCircle },
+                    { id: 'soporte', label: 'Soporte Técnico', icon: Wrench },
+                    { id: 'libre', label: 'Actividad Libre', icon: FileText },
                   ].map((cat) => {
                     const IconComp = cat.icon;
                     return (

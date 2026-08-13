@@ -123,10 +123,10 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* CENTRO (DESKTOP): NAVBAR ÚNICA CON PESTAÑAS */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <nav className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-200 dark:border-slate-700 shrink-0">
           <button
             onClick={() => onSelectTab('dashboard')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               activeTab === 'dashboard'
                 ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
@@ -138,19 +138,19 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onSelectTab('gestion')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               activeTab === 'gestion'
                 ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
             }`}
           >
             <FolderKanban className="w-3.5 h-3.5" />
-            <span>Gestión de Reportes</span>
+            <span>Gestión</span>
           </button>
 
           <button
             onClick={() => onSelectTab('historial')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               activeTab === 'historial'
                 ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
@@ -163,7 +163,7 @@ export const Header: React.FC<HeaderProps> = ({
           {userSession?.rol?.includes('Administrador') && (
             <button
               onClick={() => onSelectTab('clientes')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 activeTab === 'clientes'
                   ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
@@ -176,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onSelectTab('contrasenas')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               activeTab === 'contrasenas'
                 ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
@@ -188,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onSelectTab('recordatorios')}
-            className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               activeTab === 'recordatorios'
                 ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
@@ -205,11 +205,11 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* DERECHA: BOTÓN CREAR, SELECTOR DE FECHA POPOVER & PERFIL DE USUARIO */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* BOTÓN ACCIÓN CREAR REPORTE */}
           <button
             onClick={() => onSelectTab('crear')}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition-all whitespace-nowrap"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Crear Reporte</span>
