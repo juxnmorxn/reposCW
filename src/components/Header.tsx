@@ -137,18 +137,6 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
-            onClick={() => onSelectTab('crear')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === 'crear'
-                ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20'
-                : 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 hover:bg-brand-100 border border-brand-200'
-            }`}
-          >
-            <PlusCircle className="w-3.5 h-3.5" />
-            <span>Crear Reporte</span>
-          </button>
-
-          <button
             onClick={() => onSelectTab('gestion')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'gestion'
@@ -161,20 +149,15 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
-            onClick={() => onSelectTab('recordatorios')}
-            className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === 'recordatorios'
+            onClick={() => onSelectTab('historial')}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'historial'
                 ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
             }`}
           >
-            <Bell className="w-3.5 h-3.5" />
-            <span>Seguimientos</span>
-            {pendingFollowUpsCount > 0 && (
-              <span className="w-4 h-4 bg-amber-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center">
-                {pendingFollowUpsCount}
-              </span>
-            )}
+            <History className="w-3.5 h-3.5" />
+            <span>Historial</span>
           </button>
 
           {userSession?.rol?.includes('Administrador') && (
@@ -204,20 +187,33 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <button
-            onClick={() => onSelectTab('historial')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              activeTab === 'historial'
+            onClick={() => onSelectTab('recordatorios')}
+            className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'recordatorios'
                 ? 'bg-white dark:bg-slate-900 text-brand-600 shadow-sm border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-200/50'
             }`}
           >
-            <History className="w-3.5 h-3.5" />
-            <span>Historial</span>
+            <Bell className="w-3.5 h-3.5" />
+            <span>Seguimientos</span>
+            {pendingFollowUpsCount > 0 && (
+              <span className="w-4 h-4 bg-amber-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center">
+                {pendingFollowUpsCount}
+              </span>
+            )}
           </button>
         </nav>
 
-        {/* DERECHA: SELECTOR DE FECHA POPOVER & PERFIL DE USUARIO */}
+        {/* DERECHA: BOTÓN CREAR, SELECTOR DE FECHA POPOVER & PERFIL DE USUARIO */}
         <div className="flex items-center gap-2">
+          {/* BOTÓN ACCIÓN CREAR REPORTE */}
+          <button
+            onClick={() => onSelectTab('crear')}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md shadow-brand-500/20 active:scale-95 transition-all"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Crear Reporte</span>
+          </button>
           {/* POPOVER FILTRO DE FECHA */}
           <div className="relative" ref={popoverRef}>
             <button

@@ -511,9 +511,10 @@ function DashboardContent() {
                   </select>
                 </div>
 
-                <div className="hidden md:flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+                <div className="hidden md:flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar bg-slate-50 dark:bg-slate-800/40 p-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider pl-1 shrink-0">Categoría:</span>
                   {[
-                    { id: 'todos', label: 'Todas las Categorías', icon: Layers },
+                    { id: 'todos', label: 'Todas', icon: Layers },
                     { id: 'soporte', label: 'Soporte', icon: Wrench },
                     { id: 'configuracion', label: 'Configuración', icon: Settings },
                     { id: 'seguimiento', label: 'Seguimiento', icon: PhoneCall },
@@ -525,10 +526,10 @@ function DashboardContent() {
                       <button
                         key={cat.id}
                         onClick={() => setTipoFiltro(cat.id)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
                           tipoFiltro === cat.id
                             ? 'bg-brand-600 text-white shadow-sm'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700'
                         }`}
                       >
                         <IconComp className="w-3.5 h-3.5" />
